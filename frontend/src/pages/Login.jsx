@@ -34,7 +34,7 @@ export default function Login() {
             </div>
             <div>
               <div className="text-xl font-extrabold tracking-tight">Bimbel AELC</div>
-              <div className="text-xs text-blue-200">CV Arita Yasa Nusantara</div>
+              <div className="text-xs text-blue-200">CV Artta Yasa Nusantara</div>
             </div>
           </div>
           <div className="space-y-4 max-w-md">
