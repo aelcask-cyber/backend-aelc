@@ -6,9 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { Plus, Trash2, UserCog, Clock, Printer } from "lucide-react";
+import { Plus, Trash2, UserCog, Clock, Printer, FileSpreadsheet } from "lucide-react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import * as XLSX from "xlsx";
+import { SchedulePrintSheet } from "@/components/SchedulePrintSheet";
 
 export default function Schedules() {
   const [schedules, setSchedules] = useState([]);
@@ -18,6 +20,7 @@ export default function Schedules() {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ day: "Monday", time_slot: "10.00 - 11.00", student_id: "" });
   const [activeTeacher, setActiveTeacher] = useState("");
+  const [printing, setPrinting] = useState(false);
   const printRef = useRef(null);
 
   const load = async () => {
@@ -71,39 +74,57 @@ export default function Schedules() {
   // Baris grid = jam mengajar guru + jam yang sudah ada jadwalnya (agar tidak ada jadwal tersembunyi)
   const teacherSlots = TIME_SLOTS.filter(t => teacherTimes(availableSlots).includes(t) || filtered.some(s => s.time_slot === t));
 
+  const fileLabel = () => `Jadwal-${(activeTeacherObj?.nama || "Guru").replace(/\s+/g, "-")}-${new Date().toISOString().slice(0,10)}`;
+
   const printPDF = async () => {
     if (!activeTeacher) return toast.error("Pilih guru dulu");
-    if (!printRef.current) return;
     toast.loading("Membuat PDF jadwal...", { id: "sch" });
+    setPrinting(true);
     try {
-      const canvas = await html2canvas(printRef.current, { scale: 2, backgroundColor: "#ffffff" });
-      const imgData = canvas.toDataURL("image/png");
-      // A4 landscape full-page (297 x 210 mm), fill entire width
-      const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+      await new Promise(r => setTimeout(r, 350));
+      if (!printRef.current) throw new Error("no sheet");
+      const canvas = await html2canvas(printRef.current, { scale: 2, backgroundColor: "#ffffff", windowWidth: 1400 });
       const pageW = 297, pageH = 210;
-      const imgW = pageW;
-      const imgH = (canvas.height * imgW) / canvas.width;
+      const imgH = (canvas.height * pageW) / canvas.width;
+      const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
       if (imgH <= pageH) {
-        pdf.addImage(imgData, "PNG", 0, 0, imgW, imgH);
+        pdf.addImage(canvas.toDataURL("image/png"), "PNG", 0, 0, pageW, imgH);
       } else {
-        // paginate: split canvas vertically per page
-        const pxPerMM = canvas.width / imgW;
-        const pageChunkPx = pageH * pxPerMM;
+        const pxPerMM = canvas.width / pageW;
+        const pageChunkPx = Math.floor(pageH * pxPerMM);
         let sY = 0;
         while (sY < canvas.height) {
           const chunkH = Math.min(pageChunkPx, canvas.height - sY);
           const tmp = document.createElement("canvas");
           tmp.width = canvas.width; tmp.height = chunkH;
           tmp.getContext("2d").drawImage(canvas, 0, sY, canvas.width, chunkH, 0, 0, canvas.width, chunkH);
-          pdf.addImage(tmp.toDataURL("image/png"), "PNG", 0, 0, imgW, chunkH / pxPerMM);
+          pdf.addImage(tmp.toDataURL("image/png"), "PNG", 0, 0, pageW, chunkH / pxPerMM);
           sY += chunkH;
           if (sY < canvas.height) pdf.addPage("a4", "landscape");
         }
       }
-      const label = (activeTeacherObj?.nama || "Guru").replace(/\s+/g, "-");
-      pdf.save(`Jadwal-${label}-${new Date().toISOString().slice(0,10)}.pdf`);
+      pdf.save(`${fileLabel()}.pdf`);
       toast.success("PDF jadwal berhasil diunduh", { id: "sch" });
     } catch (e) { toast.error("Gagal membuat PDF", { id: "sch" }); }
+    setPrinting(false);
+  };
+
+  const exportExcel = () => {
+    if (!activeTeacher) return toast.error("Pilih guru dulu");
+    const header = ["Waktu", ...DAYS.map(d => DAYS_ID[d])];
+    const rows = teacherSlots.map(time => [
+      time,
+      ...DAYS.map(day => getCell(day, time).map(s => {
+        const st = studentMap[s.student_id];
+        return st ? `#${st.no_urut} ${st.nama}${st.kelas ? ` (${st.kelas})` : ""}` : "Siswa terhapus";
+      }).join("\n")),
+    ]);
+    const ws = XLSX.utils.aoa_to_sheet([[`Jadwal Mingguan — ${activeTeacherObj?.nama || ""}`], [], header, ...rows]);
+    ws["!cols"] = [{ wch: 14 }, ...DAYS.map(() => ({ wch: 30 }))];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Jadwal");
+    XLSX.writeFile(wb, `${fileLabel()}.xlsx`);
+    toast.success("Excel jadwal berhasil diunduh");
   };
 
   return (
@@ -126,9 +147,13 @@ export default function Schedules() {
               </SelectContent>
             </Select>
           </div>
-          <Button data-testid="print-schedule-btn" onClick={printPDF} disabled={!activeTeacher || teacherSlots.length === 0}
+          <Button data-testid="print-schedule-btn" onClick={printPDF} disabled={!activeTeacher || teacherSlots.length === 0 || printing}
                   variant="outline" className="border-slate-400 text-slate-700 hover:bg-slate-100">
-            <Printer className="h-4 w-4 mr-2"/> Cetak PDF A4
+            <Printer className="h-4 w-4 mr-2"/> Cetak PDF
+          </Button>
+          <Button data-testid="export-schedule-excel-btn" onClick={exportExcel} disabled={!activeTeacher || teacherSlots.length === 0}
+                  variant="outline" className="border-emerald-500 text-emerald-700 hover:bg-emerald-50">
+            <FileSpreadsheet className="h-4 w-4 mr-2"/> Export Excel
           </Button>
         </div>
       </div>
@@ -153,7 +178,7 @@ export default function Schedules() {
               <p className="text-xs text-slate-500 mt-1">Buka menu <span className="font-semibold">Data Guru → Edit</span> untuk mengatur jam mengajar guru ini.</p>
             </div>
           ) : (
-          <div ref={printRef} className="bg-white border border-slate-200 rounded-xl overflow-x-auto" style={{ scrollbarGutter: "stable" }}>
+          <div className="bg-white border border-slate-200 rounded-xl overflow-x-auto" style={{ scrollbarGutter: "stable" }}>
             <div className="px-6 pt-5 pb-3 border-b border-slate-200 bg-white">
               <div className="text-xl font-extrabold text-slate-900">Jadwal Mingguan — {activeTeacherObj?.nama}</div>
               <div className="text-xs text-slate-500">{activeTeacherObj?.mata_pelajaran ? `${activeTeacherObj.mata_pelajaran} · ` : ""}Senin – Sabtu · Bimbel AELC</div>
@@ -215,6 +240,13 @@ export default function Schedules() {
           </div>
           )}
         </>
+      )}
+
+      {printing && (
+        <div style={{ position: "fixed", left: -99999, top: 0 }}>
+          <SchedulePrintSheet innerRef={printRef} teacher={activeTeacherObj} times={teacherSlots} getCell={getCell}
+                              studentMap={studentMap} isAvailable={(d, t) => teacherHasSlot(availableSlots, d, t)}/>
+        </div>
       )}
 
       <Dialog open={open} onOpenChange={setOpen}>
