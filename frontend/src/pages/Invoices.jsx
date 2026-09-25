@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import api, { formatApiError } from "@/lib/api";
-import { fmtIDR, fmtDate } from "@/lib/format";
+import { fmtIDR, fmtDate, capWords } from "@/lib/format";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -213,9 +213,9 @@ function InvoiceBody({ logo, company, alloc, student, teacher, totalBiaya, total
       <div className="grid grid-cols-2 gap-6 mt-6">
         <div data-testid="invoice-bill-to">
           <div className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Bill To</div>
-          <div className="text-base font-bold text-slate-900">{student?.nama}</div>
-          <div className="text-sm text-slate-600">Tgl. Lahir: {fmtDate(student?.tanggal_lahir)}</div>
-          <div className="text-sm text-slate-600">{student?.asal_sekolah || "-"}</div>
+          <div className="text-base font-bold text-slate-900">{capWords(student?.nama)}</div>
+          <div className="text-sm text-slate-600">{fmtDate(student?.tanggal_lahir)}</div>
+          <div className="text-sm text-slate-600">{capWords(student?.asal_sekolah) || "-"}</div>
           <div className="text-sm text-slate-600">{student?.no_hp}</div>
         </div>
         <div className="text-right">
@@ -248,7 +248,6 @@ function InvoiceBody({ logo, company, alloc, student, teacher, totalBiaya, total
               <td className="px-4 py-4">
                 <div className="font-semibold text-slate-900">{student?.program_bimbel}</div>
                 <div className="text-xs text-slate-600 mt-0.5">Program: {student?.program_kelas}</div>
-                <div className="text-sm font-semibold text-blue-700 mt-1">Guru: {teacher?.nama || "-"}</div>
               </td>
               <td className="px-4 py-4 text-center font-mono text-slate-600">
                 {Number(alloc.pertemuan) > 0 ? `${alloc.pertemuan}x` : "—"}

@@ -30,6 +30,8 @@ User meng-upload zip berisi proyek Emergent "Bimbel AELC" dan meminta: "tolong b
 
 - **25 Sep 2026 (batch 3)**: Nomor invoice unik: `unique_invoice_no()` menambah akhiran `-2`, `-3`, … jika basis sudah dipakai; nomor manual duplikat ditolak 409 (create & update). Diuji via curl (3 alokasi siswa sama → -, -2, -3; duplikat manual → 409).
 
+- **25 Sep 2026 (batch 4)**: Invoice: BILL TO tampil tanggal lahir tanpa prefiks "Tgl. Lahir", baris "Guru: ..." di Description dihapus. Kapitalisasi otomatis huruf awal tiap kata (`capWords`) pada input Nama/Kelas/Sekolah siswa, Nama/Mapel guru, Buku alokasi; data lama dinormalisasi sekali via script.
+
 ## Backlog / Next Tasks
 - P1: Halaman kelola akun admin tambahan (multi-user internal) — saat ini hanya 1 admin seeded
 - P2: Migrasi `@app.on_event` ke lifespan handler (deprecasi FastAPI)

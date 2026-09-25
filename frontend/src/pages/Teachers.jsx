@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import api, { formatApiError } from "@/lib/api";
-import { TIME_SLOTS, DAYS, DAYS_ID, slotKey, parseSlot, sortSlots } from "@/lib/format";
+import { TIME_SLOTS, DAYS, DAYS_ID, slotKey, parseSlot, sortSlots, capWords } from "@/lib/format";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -154,8 +154,8 @@ export default function Teachers() {
           <DialogHeader><DialogTitle>{editing ? "Edit Guru" : "Tambah Guru"}</DialogTitle></DialogHeader>
           <div className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div><Label>Nama</Label><Input data-testid="teacher-form-nama" value={form.nama} onChange={(e)=>setForm({...form, nama:e.target.value})}/></div>
-              <div><Label>Mata Pelajaran</Label><Input data-testid="teacher-form-mapel" value={form.mata_pelajaran} onChange={(e)=>setForm({...form, mata_pelajaran:e.target.value})}/></div>
+              <div><Label>Nama</Label><Input data-testid="teacher-form-nama" value={form.nama} onChange={(e)=>setForm({...form, nama:capWords(e.target.value)})}/></div>
+              <div><Label>Mata Pelajaran</Label><Input data-testid="teacher-form-mapel" value={form.mata_pelajaran} onChange={(e)=>setForm({...form, mata_pelajaran:capWords(e.target.value)})}/></div>
               <div><Label>No HP</Label><Input data-testid="teacher-form-nohp" value={form.no_hp} onChange={(e)=>setForm({...form, no_hp:e.target.value})}/></div>
             </div>
             <div>

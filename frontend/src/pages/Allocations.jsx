@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, useRef } from "react";
 import api, { formatApiError } from "@/lib/api";
-import { fmtIDR, fmtDate } from "@/lib/format";
+import { fmtIDR, fmtDate, capWords } from "@/lib/format";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -332,7 +332,7 @@ export default function Allocations() {
             <div><Label>Biaya per Bulan (Rp)</Label><Input data-testid="alloc-form-biaya" type="number" value={form.biaya} onChange={(e)=>setForm({...form, biaya:e.target.value})}/></div>
             <div>
               <Label className="flex items-center gap-1"><BookOpen className="h-3.5 w-3.5"/> Buku (Nama)</Label>
-              <Input data-testid="alloc-form-buku" value={form.buku} onChange={(e)=>setForm({...form, buku:e.target.value})} placeholder="cth: Matematika SD 5"/>
+              <Input data-testid="alloc-form-buku" value={form.buku} onChange={(e)=>setForm({...form, buku:capWords(e.target.value)})} placeholder="cth: Matematika SD 5"/>
             </div>
             <div><Label>Harga Buku (Rp)</Label><Input data-testid="alloc-form-harga-buku" type="number" value={form.harga_buku} onChange={(e)=>setForm({...form, harga_buku:e.target.value})}/></div>
             <div><Label>No Invoice</Label><Input data-testid="alloc-form-invoice" placeholder="Kosongkan → auto: {Nama}-INV-AELC-{Bulan}-{No} (+ -2, -3 jika sudah ada)" value={form.no_invoice} onChange={(e)=>setForm({...form, no_invoice:e.target.value})}/></div>

@@ -43,6 +43,9 @@ export const teacherHasSlot = (slots, day, time) =>
 export const teacherTimes = (slots) =>
   TIME_SLOTS.filter((t) => (slots || []).some((s) => parseSlot(s).time === t));
 
+// Huruf awal setiap kata menjadi kapital, sisa huruf dibiarkan seperti diketik.
+export const capWords = (s) => String(s || "").replace(/(^|[\s\-/(])(\p{L})/gu, (m, pre, ch) => pre + ch.toUpperCase());
+
 // Nama ≥3 kata → ambil 2 kata pertama; ≤2 kata tampil utuh.
 export const shortName = (nama) => {
   const w = String(nama || "").trim().split(/\s+/).filter(Boolean);

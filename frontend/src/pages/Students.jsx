@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import api, { formatApiError } from "@/lib/api";
-import { fmtIDR, fmtDate, PROGRAM_KELAS, PROGRAM_BIMBEL } from "@/lib/format";
+import { fmtIDR, fmtDate, PROGRAM_KELAS, PROGRAM_BIMBEL, capWords } from "@/lib/format";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
 import { Button } from "@/components/ui/button";
@@ -168,7 +168,7 @@ export default function Students() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="sm:col-span-2">
               <Label>Nama</Label>
-              <Input data-testid="form-nama" value={form.nama} onChange={(e)=>setForm({...form, nama: e.target.value})}/>
+              <Input data-testid="form-nama" value={form.nama} onChange={(e)=>setForm({...form, nama: capWords(e.target.value)})}/>
             </div>
             <div>
               <Label>Tanggal Lahir</Label>
@@ -176,11 +176,11 @@ export default function Students() {
             </div>
             <div>
               <Label>Kelas</Label>
-              <Input data-testid="form-kelas" placeholder="cth: SD 5" value={form.kelas} onChange={(e)=>setForm({...form, kelas: e.target.value})}/>
+              <Input data-testid="form-kelas" placeholder="cth: SD 5" value={form.kelas} onChange={(e)=>setForm({...form, kelas: capWords(e.target.value)})}/>
             </div>
             <div className="sm:col-span-2">
               <Label>Asal Sekolah</Label>
-              <Input data-testid="form-sekolah" value={form.asal_sekolah} onChange={(e)=>setForm({...form, asal_sekolah: e.target.value})}/>
+              <Input data-testid="form-sekolah" value={form.asal_sekolah} onChange={(e)=>setForm({...form, asal_sekolah: capWords(e.target.value)})}/>
             </div>
             <div>
               <Label>Program Kelas</Label>
