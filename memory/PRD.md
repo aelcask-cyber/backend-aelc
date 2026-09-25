@@ -36,6 +36,8 @@ User meng-upload zip berisi proyek Emergent "Bimbel AELC" dan meminta: "tolong b
 
 - **25 Sep 2026 (batch 6)**: Kartu jadwal (layar, PDF, Excel) hanya menampilkan Nama + Kelas (tanpa #no_urut). Teks nama di PDF terpotong setengah karena `overflow:hidden + nowrap + ellipsis` di html2canvas → diganti `wordBreak` + `lineHeight 1.5`. Diverifikasi render PDF via pymupdf.
 
+- **25 Sep 2026 (batch 7)**: Grand Total di halaman Siswa per Guru & Laporan Pendapatan (header + footer PDF) = Paid + Unpaid; label "(tidak dihitung)" dihapus; rincian Paid dan Unpaid tetap ditampilkan.
+
 ## Backlog / Next Tasks
 - P1: Halaman kelola akun admin tambahan (multi-user internal) — saat ini hanya 1 admin seeded
 - P2: Migrasi `@app.on_event` ke lifespan handler (deprecasi FastAPI)

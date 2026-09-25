@@ -176,8 +176,8 @@ export default function Allocations() {
               <div data-testid="alloc-summary-unpaid" className="font-mono font-bold text-rose-800">{fmtIDR(filteredUnpaid)}</div>
             </div>
             <div className="px-3 py-2 rounded-lg bg-blue-50 border border-blue-200">
-              <div className="text-blue-700">Grand Total</div>
-              <div data-testid="alloc-summary-total" className="font-mono font-bold text-blue-800">{fmtIDR(filteredPaid)}</div>
+              <div className="text-blue-700">Grand Total (Paid + Unpaid)</div>
+              <div data-testid="alloc-summary-total" className="font-mono font-bold text-blue-800">{fmtIDR(filteredTotal)}</div>
             </div>
           </div>
         </div>
@@ -252,10 +252,10 @@ export default function Allocations() {
               <div className="text-sm text-slate-600">{filterTeacher === "all" ? "Semua Guru" : (teacherMap[filterTeacher]?.nama || "-")} · Dicetak {fmtDate(new Date().toISOString())}</div>
             </div>
             <div className="text-right">
-              <div className="text-xs text-slate-500">Grand Total (Paid Only)</div>
-              <div className="text-2xl font-extrabold text-blue-700">{fmtIDR(filteredPaid)}</div>
+              <div className="text-xs text-slate-500">Grand Total (Paid + Unpaid)</div>
+              <div className="text-2xl font-extrabold text-blue-700">{fmtIDR(filteredTotal)}</div>
               <div className="text-xs text-emerald-700 font-semibold">Paid: {fmtIDR(filteredPaid)}</div>
-              <div className="text-xs text-rose-700 font-semibold">Unpaid: {fmtIDR(filteredUnpaid)} <span className="text-slate-400">(tidak dihitung)</span></div>
+              <div className="text-xs text-rose-700 font-semibold">Unpaid: {fmtIDR(filteredUnpaid)}</div>
             </div>
           </div>
           <table className="w-full text-sm mt-4" style={{fontSize: 12}}>
@@ -296,8 +296,8 @@ export default function Allocations() {
             </tbody>
             <tfoot>
               <tr style={{background:"#F8FAFC"}}>
-                <td colSpan={8} className="px-2 py-2 text-right font-bold">GRAND TOTAL (PAID ONLY)</td>
-                <td className="px-2 py-2 text-right font-mono font-extrabold" style={{color:"#1D4ED8"}}>{fmtIDR(filteredPaid)}</td>
+                <td colSpan={8} className="px-2 py-2 text-right font-bold">GRAND TOTAL (PAID + UNPAID)</td>
+                <td className="px-2 py-2 text-right font-mono font-extrabold" style={{color:"#1D4ED8"}}>{fmtIDR(filteredTotal)}</td>
                 <td colSpan={2}></td>
               </tr>
             </tfoot>
