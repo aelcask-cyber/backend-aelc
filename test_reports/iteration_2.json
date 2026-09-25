@@ -1,0 +1,35 @@
+{
+  "summary": "Backend regression testing (pytest) for Bimbel AELC — 20/20 passed. Covered: JWT login + bad password, /auth/me with Bearer, unauth 401, /auth/session missing/invalid X-Session-ID (400/401), Students CRUD (auto no_urut increment, sorted list, update persistence), Teachers CRUD, Allocations with NEW invoice format `{FirstName}-INV-AELC-{MM}-{no_urut}` verified end-to-end, Paid/Unpaid toggle, Schedules Monday accepted + Sunday rejected (422), Dashboard stats (5 fields), NEW revenue-monthly endpoint (6 buckets ascending, last=current YYYY-MM), Settings GET defaults + PUT company persistence, Logo upload/delete + oversize 400 rejection, Student cascade delete (allocations + schedules).",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "POST /api/schedules", "issue": "DAY Literal still includes 'Saturday' although PRD/frontend is Mon-Fri only. Sunday is rejected (422) but Saturday would silently be accepted."},
+      {"endpoint": "GET /api/dashboard/stats", "issue": "Response no longer includes a legacy 'total_alokasi' or similar count; not required by frontend but worth confirming with UI."},
+      {"endpoint": "POST /api/allocations", "issue": "next_invoice_no() fallback branch (when student_id is empty/not found) still uses old regex `INV-AELC-{year}-` while active format uses `{MM}` — mismatched sequence counting. Not hit in normal flow but dead-inconsistent code path."}
+    ]
+  },
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_report_links": [
+    "/app/backend/tests/backend_test.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "(Optional) Remove 'Saturday' from DAY Literal in server.py to match Mon-Fri PRD.",
+    "(Optional) Update next_invoice_no fallback regex to match new `{MM}` format for sequence counting."
+  ],
+  "critical_code_review_comments": [
+    "server.py DAY Literal includes Saturday but frontend only supports Mon-Fri — inconsistent validation surface.",
+    "next_invoice_no fallback branch mixes old (YYYY) and new (MM) formats — dead-inconsistent, could cause duplicate invoice numbers if ever triggered.",
+    "get_current_user JWT branch queries `{'id': payload['sub']}` while session branch uses `user_id` — both fields set for admin so OK, but Google-only users could break bearer-JWT lookup (not applicable now).",
+    "server.py is ~554 lines and single-file; consider splitting into routers/models modules if it grows further (still acceptable at current size)."
+  ],
+  "updated_files": [
+    "/app/backend/tests/backend_test.py"
+  ],
+  "success_rate": {"backend": "100% (20/20)", "frontend": "not tested (backend-only request)"},
+  "test_credentials": "aelc.ask@gmail.com / AelcAdmin2026 (from /app/memory/test_credentials.md) — verified working",
+  "seed_data_creation": "Tests create ephemeral TEST_-prefixed students/teachers/allocations/schedules and clean up via session-scoped fixture teardown.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "backend_test.py at /app/backend/tests/ is now the pytest regression suite (20 tests, ~6s). Fixtures use session-scoped admin token and a created_ids tracker for teardown. New coverage vs iteration_1: /auth/session error paths, /auth/me user_id field, new invoice format `{FirstName}-INV-AELC-{MM}-{no_urut}`, /api/dashboard/revenue-monthly, /api/settings GET+PUT company, /api/settings/logo PUT/DELETE + 2MB limit. Frontend not tested — main agent may proceed with UI test if needed."
+}

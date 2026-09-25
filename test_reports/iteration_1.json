@@ -1,0 +1,24 @@
+{
+  "summary": "Bimbel AELC backend smoke + integration testing via public URL. 22/22 checks passed: JWT login, /auth/me, protected endpoint 401 without token, Students CRUD with auto no_urut increment & sorted list, Teachers CRUD, Allocations CRUD with auto INV-AELC-YYYY-NNNN generation & payment_status update, Schedules CRUD with Mon-Fri validation, Dashboard stats fields & arithmetic (pendapatan aggregates Paid biaya correctly), cascade deletes (student -> allocations+schedules, teacher -> allocations+schedules).",
+  "tested_scope": ["backend", "auth", "integration"],
+  "passed": [
+    "POST /api/auth/login returns token + user",
+    "GET /api/auth/me returns admin user with Bearer token",
+    "Protected endpoints return 401 without Authorization header",
+    "POST /api/students auto-sets no_urut and increments correctly",
+    "GET /api/students sorted ascending by no_urut",
+    "PUT /api/students/{id} updates fields",
+    "Teachers full CRUD (create/list/update/delete)",
+    "POST /api/allocations auto-generates no_invoice in INV-AELC-YYYY-NNNN format when empty",
+    "PUT /api/allocations toggles payment_status Paid/Unpaid",
+    "POST /api/schedules accepts Monday-Friday, rejects Saturday (422)",
+    "GET /api/dashboard/stats returns all 6 fields with correct arithmetic (pendapatan sum of Paid biaya)",
+    "DELETE /api/students cascades to allocations and schedules",
+    "DELETE /api/teachers cascades to allocations and schedules"
+  ],
+  "failed": [],
+  "action_items": [],
+  "success_rate": {"backend": "100%", "frontend": "not tested (backend-only request)"},
+  "retest_needed": false,
+  "full_testing_deferred": true
+}

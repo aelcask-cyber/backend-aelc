@@ -1,0 +1,21 @@
+/* Reset defaults - dashboard uses left-aligned layout */
+.App {
+    min-height: 100vh;
+}
+
+/* Invoice print styles */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    .invoice-print,
+    .invoice-print * {
+        visibility: visible;
+    }
+    .invoice-print {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+}

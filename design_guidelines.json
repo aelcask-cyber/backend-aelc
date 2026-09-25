@@ -1,0 +1,117 @@
+{
+  "project_name": "Bimbel AELC - Sistem Operasional Administrasi",
+  "app_type": "dashboard",
+  "archetype": "Modern Executive & Educational ERP",
+  "theme": "Light & Dark Toggle Support (Default: Crisp Modern Light with Navy/Indigo Accent)",
+  "language": "Indonesian (Bahasa Indonesia)",
+  "typography": {
+    "font_family_heading": "Plus Jakarta Sans, sans-serif",
+    "font_family_body": "Plus Jakarta Sans, sans-serif",
+    "font_family_mono": "JetBrains Mono, monospace",
+    "heading_h1": "text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100",
+    "heading_h2": "text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-slate-100",
+    "heading_h3": "text-xl sm:text-2xl font-semibold tracking-tight text-slate-800 dark:text-slate-200",
+    "heading_h4": "text-lg font-semibold text-slate-800 dark:text-slate-200",
+    "body_text": "text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed",
+    "subtext": "text-xs sm:text-sm text-slate-500 dark:text-slate-400",
+    "badge_text": "text-xs font-semibold uppercase tracking-wider"
+  },
+  "colors": {
+    "primary": {
+      "DEFAULT": "#2563EB",
+      "hover": "#1D4ED8",
+      "active": "#1E40AF",
+      "light": "#EFF6FF",
+      "border": "#BFDBFE"
+    },
+    "brand_indigo": {
+      "DEFAULT": "#1E293B",
+      "header": "#0F172A",
+      "accent": "#3B82F6"
+    },
+    "status": {
+      "active_bg": "#DCFCE7",
+      "active_text": "#15803D",
+      "inactive_bg": "#FEE2E2",
+      "inactive_text": "#B91C1C",
+      "paid_bg": "#D1FAE5",
+      "paid_text": "#047857",
+      "unpaid_bg": "#FEE2E2",
+      "unpaid_text": "#C2410C"
+    },
+    "surface": {
+      "background_light": "#F8FAFC",
+      "card_light": "#FFFFFF",
+      "border_light": "#E2E8F0",
+      "background_dark": "#0F172A",
+      "card_dark": "#1E293B",
+      "border_dark": "#334155"
+    }
+  },
+  "visual_enhancers": {
+    "card_style": "bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xs hover:shadow-md transition-all duration-200",
+    "glass_nav": "backdrop-blur-md bg-white/80 dark:bg-slate-900/80 border-b border-slate-200/80 dark:border-slate-800/80 sticky top-0 z-40",
+    "active_tab": "bg-blue-600 text-white shadow-xs font-medium rounded-lg",
+    "inactive_tab": "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg",
+    "badge_paid": "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800",
+    "badge_unpaid": "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-100 text-rose-800 dark:bg-rose-950/60 dark:text-rose-300 border border-rose-200 dark:border-rose-800",
+    "badge_active": "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300 border border-blue-200 dark:border-blue-800",
+    "badge_inactive": "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400 border border-slate-200 dark:border-slate-700"
+  },
+  "grids": {
+    "dashboard_kpi": "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5",
+    "bento_dashboard": "grid grid-cols-1 lg:grid-cols-12 gap-6",
+    "schedule_weekly_grid": "grid grid-cols-6 gap-2 sm:gap-4 overflow-x-auto min-w-[800px]",
+    "form_two_columns": "grid grid-cols-1 sm:grid-cols-2 gap-4"
+  },
+  "layouts": {
+    "sidebar_width": "w-64 shrink-0",
+    "content_padding": "p-4 sm:p-6 lg:p-8 space-y-6",
+    "header_height": "h-16"
+  },
+  "motion": {
+    "transition_fast": "transition-all duration-150 ease-in-out",
+    "transition_normal": "transition-all duration-200 ease-in-out",
+    "hover_lift": "hover:-translate-y-0.5 hover:shadow-sm"
+  },
+  "accessibility": {
+    "data_testid_required": true,
+    "contrast_ratio": "WCAG AA compliant",
+    "focus_ring": "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
+  },
+  "media": {
+    "bimbel_logo_placeholder": "Bimbel AELC Badge Icon + Bold Typography",
+    "company_details": {
+      "name": "Bimbel AELC",
+      "legal_entity": "CV ARITA YASA NUSANTARA",
+      "bank_name": "Bank BCA",
+      "bank_account": "a/n CV ARITA YASA NUSANTARA"
+    }
+  },
+  "image_urls": {
+    "hero_tutoring": "https://images.pexels.com/photos/7156103/pexels-photo-7156103.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "teacher_assisting": "https://images.pexels.com/photos/18870248/pexels-photo-18870248.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "students_classroom": "https://images.unsplash.com/photo-1561089489-f13d5e730d72?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzV8MHwxfHNlYXJjaHwzfHx0dXRvcmluZyUyMGVkdWNhdGlvbiUyMHN0dWRlbnRzJTIwY2xhc3Nyb29tJTIwbGVhcm5pbmd8ZW58MHx8fHwxNzkwMjIzMDUyfDA&ixlib=rb-4.1.0&q=85"
+  },
+  "component_path": "/app/frontend/src/components/ui",
+  "instructions_to_main_agent": [
+    "1. App Navigation & Auth: Build a responsive sidebar with logo 'Bimbel AELC', navigation links with icons (Lucide icons), dark/light mode toggle, user info, and Logout button. Ensure JWT-based admin authentication flow with clean login form.",
+    "2. Dashboard Overview: Include KPI metric cards (Total Siswa, Siswa Aktif, Total Guru, Pendapatan Bulan Ini, Total Invoice Unpaid). Show interactive chart/table for Quick Summary & Upcoming Weekly Classes.",
+    "3. Modul 1 - Data Keseluruhan Siswa (Master Data): Build full CRUD table with search, filter (by Program Kelas & Program Bimbel & Status), pagination, and Modal Form with fields: No Urut, Nama, Tanggal Lahir, Kelas, Asal Sekolah, Program Kelas (Junior Regular, Junior Intensive, Super Child Regular, Super Child Intensive), Program Bimbel (Bimbel Global, Bimbel National, Les Mandarin, Les Jari Math Matematika), Biaya (IDR formatted input), No HP/WhatsApp, Status (Active/Inactive).",
+    "4. Modul Master Data Guru (Master Data Guru): Build full CRUD table for teachers with Name, Specialization/Subject, Phone/WA, Status, and list of allocated students count.",
+    "5. Modul 2 - Data Siswa per Guru: Allocation UI allowing assigning students to teachers. Table with fields: Nama Guru, Nama Siswa, Pertemuan, Biaya, No Invoice, Keterangan Pembayaran (Paid/Unpaid badge). Include filter by Guru and Payment Status with quick toggle paid status button.",
+    "6. Modul 3 - Jadwal Siswa: Build dynamic weekly calendar schedule grid (Monday - Friday). Columns: Time (e.g. 14.00-15.00, 15.00-16.00, 16.00-17.00, 17.00-18.00). Rows show Monday to Friday or time slots as rows with Mon-Fri columns. Each slot shows cards displaying No Urut, Nama Siswa, Kelas, Program, and Teacher. Provide modal to add/edit/delete scheduled class.",
+    "7. Modul 4 - Invoice Penagihan: Build dynamic invoice generator and printable preview template. Header featuring Bimbel AELC logo & legal entity 'CV ARITA YASA NUSANTARA', Bill To (Student info), Invoice Date, Due Date, Invoice Number (auto-generated e.g. INV-AELC-2026-001). Table detailing items (Program Bimbel, Pertemuan, Fee amount). Payment Method box prominent: Bank BCA a/n CV ARITA YASA NUSANTARA. Include 'Download PDF' button (using html2pdf or window.print formatted print preview) and 'Kirim via WhatsApp' button (generating formatted WA link with prefilled text).",
+    "8. Language & Formatting: All text in Indonesian (Rupiah currency formatting e.g. Rp 750.000, Indonesian date format e.g. 24 Februari 2026). Ensure exact data-testid on buttons, inputs, modals, and menu items.",
+    "9. Error handling & Feedback: Toast notifications on every CRUD action (Create, Update, Delete, Status change, Invoice generation) using sonner toast."
+  ],
+  "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
+    "DO NOT center align the app container (.App { text-align: center }). Use standard responsive left-aligned dashboard layout with sidebar.",
+    "DO NOT use raw transparent background on overlays, headers, or dropdowns. Use solid backgrounds or backdrop-blur with minimum opacity.",
+    "DO NOT use generic transition: all. Use specific property transitions like transition: color 0.2s, background-color 0.2s, opacity 0.2s.",
+    "EVERY interactive element (buttons, links, inputs, selects, tabs, status toggles) MUST have data-testid attribute in kebab-case.",
+    "Use currency formatting helper function: new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(value).",
+    "Ensure high contrast on interactive hover states (e.g., hover:bg-slate-900 hover:text-white).",
+    "Use shadcn components in /app/frontend/src/components/ui (dialog, select, dropdown-menu, table, input, button, badge, tabs, sonner)."
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "summary": "Backend regression (pytest) — 22/22 passed. Verified NEW monthly biaya formula: allocation total = biaya + harga_buku (pertemuan is informational, NOT multiplied). Updated TestAllocationTotalFormula::test_total_formula_in_dashboard expected deltas (Paid 150000, Unpaid 250000) and rewrote test_pertemuan_not_multiplied to compare pertemuan=0 vs pertemuan=10 with identical biaya/harga_buku — asserts both deltas ~575000 and rules out old formula (would be 5,750,000 for pertemuan=10). Made both tests race-tolerant against parallel xdist workers. Confirmed server _alloc_total() at server.py:413 returns biaya + harga_buku only.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "POST /api/schedules", "issue": "DAY Literal still includes 'Saturday' (Mon-Fri UI). Sunday=422 but Saturday silently accepted. Carry-over from iter 2/3."},
+      {"endpoint": "POST /api/allocations", "issue": "next_invoice_no() fallback branch (unknown student_id) still uses old regex `INV-AELC-{year}-` while active format uses `{MM}`. Dead-inconsistent path. Carry-over."}
+    ]
+  },
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_report_links": [
+    "/app/backend/tests/backend_test.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "(Optional) Remove 'Saturday' from DAY Literal in server.py.",
+    "(Optional) Align next_invoice_no fallback regex to new MM format."
+  ],
+  "critical_code_review_comments": [
+    "server.py:413 _alloc_total = biaya + harga_buku — matches PRD (monthly biaya). Docstring correctly notes 'pertemuan hanya informasi, tidak dikalikan'.",
+    "Dashboard /api/dashboard/stats (pendapatan/outstanding) and /api/dashboard/revenue-monthly both go through _alloc_total (DRY OK).",
+    "Same two carry-over minor issues from iterations 2/3 remain unaddressed but non-blocking."
+  ],
+  "updated_files": ["/app/backend/tests/backend_test.py"],
+  "success_rate": {"backend": "100% (22/22)", "frontend": "not tested (backend-only request)"},
+  "test_credentials": "aelc.ask@gmail.com / AelcAdmin2026 — verified working",
+  "seed_data_creation": "Ephemeral TEST_-prefixed students/teachers/allocations; cleaned via session-scoped fixture teardown.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "TestAllocationTotalFormula now enforces the monthly-biaya formula (biaya + harga_buku) via dashboard/stats deltas. test_pertemuan_not_multiplied specifically guards against regression to biaya*pertemuan by verifying pertemuan=10 does NOT multiply the total (delta remains ~575k, not 5.75M). Suite is race-tolerant (uses >= lower-bound + upper-bound assertions) for pytest-xdist. If E1 tweaks the formula again, update expected values in tests around lines 359-395 of backend_test.py.",
+  "rca of the issue": "User feedback: biaya is monthly rate, not per-meeting. Server _alloc_total already updated from (biaya*pertemuan + harga_buku) to (biaya + harga_buku). Iteration_3 tests still expected the old formula and would have failed. Fixed test expectations and added an explicit anti-regression test that compares pertemuan=0 vs pertemuan=10 to catch any future re-introduction of the multiplier."
+}

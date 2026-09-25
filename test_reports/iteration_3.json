@@ -1,0 +1,31 @@
+{
+  "summary": "Backend regression (pytest) — 22/22 passed. Focus: verify allocation-total formula fix (biaya*pertemuan + harga_buku) is reflected in /api/dashboard/stats pendapatan/outstanding, plus full smoke of auth, students, teachers, allocations (new invoice format Budi-INV-AELC-MM-no_urut), schedules, dashboard, settings, cascade deletes.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "POST /api/schedules", "issue": "DAY Literal still includes 'Saturday' although UI is Mon-Fri only — Sunday correctly 422, Saturday silently accepted."},
+      {"endpoint": "POST /api/allocations", "issue": "next_invoice_no fallback branch (empty/unknown student_id) still uses old regex `INV-AELC-{year}-` while active format uses `{MM}` — mismatched sequence counting; dead-inconsistent path, not hit in normal UI flow."}
+    ]
+  },
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_report_links": [
+    "/app/backend/tests/backend_test.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "(Optional) Remove 'Saturday' from DAY Literal in server.py.",
+    "(Optional) Align next_invoice_no fallback regex to new MM format."
+  ],
+  "critical_code_review_comments": [
+    "_alloc_total(a) = biaya*pertemuan + harga_buku — matches PRD; both dashboard stats and revenue-monthly use this helper (DRY OK).",
+    "Same two carry-over minor issues from iteration_2 not addressed but not blocking."
+  ],
+  "updated_files": ["/app/backend/tests/backend_test.py"],
+  "success_rate": {"backend": "100% (22/22)", "frontend": "not tested (backend-only request)"},
+  "test_credentials": "aelc.ask@gmail.com / AelcAdmin2026 — verified working",
+  "seed_data_creation": "Ephemeral TEST_-prefixed students/teachers/allocations/schedules; cleaned via session-scoped fixture teardown.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Added TestAllocationTotalFormula (2 tests) that use delta comparison against /dashboard/stats to prove allocation total formula (biaya*pertemuan + harga_buku) — covers reported user bug. Full suite now 22 tests, ~7s, parallel via pytest-xdist (loadscope).",
+  "rca of the issue": "User reported allocation total used only pertemuan; server _alloc_total was already corrected to biaya*pertemuan + harga_buku. New regression test verifies via dashboard stats endpoint end-to-end so future breakage is caught."
+}
