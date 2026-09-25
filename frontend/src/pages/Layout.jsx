@@ -51,14 +51,9 @@ export default function Layout() {
 
         <div className="p-3 border-t border-slate-200">
           <div className="px-3 py-2 mb-2 flex items-center gap-2.5">
-            {user?.picture ? (
-              <img src={user.picture} alt={user?.name} data-testid="sidebar-user-avatar"
-                   className="h-9 w-9 rounded-full object-cover border border-slate-200"/>
-            ) : (
-              <div className="h-9 w-9 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 text-white font-bold flex items-center justify-center text-sm">
-                {(user?.name || user?.email || "A").charAt(0).toUpperCase()}
-              </div>
-            )}
+            <div className="h-9 w-9 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 text-white font-bold flex items-center justify-center text-sm" data-testid="sidebar-user-avatar">
+              {(user?.name || user?.email || "A").charAt(0).toUpperCase()}
+            </div>
             <div className="min-w-0 flex-1">
               <div className="text-sm font-semibold text-slate-900 truncate">{user?.name || "Admin"}</div>
               <div className="text-xs text-slate-500 truncate">{user?.email}</div>

@@ -1,13 +1,13 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import api, { formatApiError } from "@/lib/api";
-import { TIME_SLOTS, DAYS, DAYS_ID, slotKey, parseSlot, sortSlots, capWords } from "@/lib/format";
+import { DAYS, DAYS_ID, parseSlot, normalizeSlots, capWords } from "@/lib/format";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Plus, Pencil, Trash2, Clock } from "lucide-react";
+import { TeacherSlotPicker } from "@/components/TeacherSlotPicker";
 
 const empty = { nama: "", mata_pelajaran: "", no_hp: "", available_slots: [] };
 
@@ -17,23 +17,13 @@ export default function Teachers() {
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(empty);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     try { const { data } = await api.get("/teachers"); setList(data); }
     catch (e) { toast.error(formatApiError(e)); }
-  };
-  useEffect(() => { load(); }, []);
+  }, []);
+  useEffect(() => { load(); }, [load]);
 
   const openAdd = () => { setEditing(null); setForm(empty); setOpen(true); };
-  // Slot lama tanpa hari dikonversi menjadi slot per hari (semua hari) saat edit.
-  const normalizeSlots = (slots) => {
-    const out = new Set();
-    (slots || []).forEach((s) => {
-      const p = parseSlot(s);
-      if (!TIME_SLOTS.includes(p.time)) return;
-      if (p.day) out.add(s); else DAYS.forEach((d) => out.add(slotKey(d, p.time)));
-    });
-    return sortSlots([...out]);
-  };
 
   const openEdit = (t) => {
     setEditing(t);
@@ -45,25 +35,6 @@ export default function Teachers() {
     });
     setOpen(true);
   };
-
-  const toggleSlot = (key) => {
-    setForm(f => {
-      const has = f.available_slots.includes(key);
-      const next = has ? f.available_slots.filter(s => s !== key) : [...f.available_slots, key];
-      return { ...f, available_slots: sortSlots(next) };
-    });
-  };
-
-  const setDay = (day, on) => {
-    setForm(f => {
-      const others = f.available_slots.filter(s => parseSlot(s).day !== day);
-      const next = on ? [...others, ...TIME_SLOTS.map(t => slotKey(day, t))] : others;
-      return { ...f, available_slots: sortSlots(next) };
-    });
-  };
-
-  const selectAll = () => setForm(f => ({ ...f, available_slots: sortSlots(DAYS.flatMap(d => TIME_SLOTS.map(t => slotKey(d, t)))) }));
-  const clearAll = () => setForm(f => ({ ...f, available_slots: [] }));
 
   const groupByDay = (slots) => {
     const g = {};
@@ -158,51 +129,7 @@ export default function Teachers() {
               <div><Label>Mata Pelajaran</Label><Input data-testid="teacher-form-mapel" value={form.mata_pelajaran} onChange={(e)=>setForm({...form, mata_pelajaran:capWords(e.target.value)})}/></div>
               <div><Label>No HP</Label><Input data-testid="teacher-form-nohp" value={form.no_hp} onChange={(e)=>setForm({...form, no_hp:e.target.value})}/></div>
             </div>
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <Label>Jam Mengajar <span className="text-slate-400 font-normal">({form.available_slots.length} slot dipilih)</span></Label>
-                <div className="flex gap-2 text-xs">
-                  <button data-testid="slots-select-all" type="button" onClick={selectAll} className="text-blue-600 hover:underline font-semibold">Pilih semua</button>
-                  <span className="text-slate-300">·</span>
-                  <button data-testid="slots-clear-all" type="button" onClick={clearAll} className="text-slate-500 hover:underline">Kosongkan</button>
-                </div>
-              </div>
-              <div className="space-y-2">
-                {DAYS.map(day => {
-                  const dayCount = form.available_slots.filter(s => parseSlot(s).day === day).length;
-                  const allDay = dayCount === TIME_SLOTS.length;
-                  return (
-                    <div key={day} className="border border-slate-200 rounded-lg overflow-hidden" data-testid={`slot-group-${day}`}>
-                      <div className="flex items-center justify-between px-3 py-2 bg-slate-50 border-b border-slate-200">
-                        <label className="flex items-center gap-2 cursor-pointer">
-                          <Checkbox data-testid={`slot-day-all-${day}`} checked={allDay ? true : dayCount > 0 ? "indeterminate" : false}
-                                    onCheckedChange={(v)=>setDay(day, v === true)}/>
-                          <span className="text-sm font-bold text-slate-800">{DAYS_ID[day]}</span>
-                        </label>
-                        <span className="text-[11px] text-slate-500">{dayCount}/{TIME_SLOTS.length} jam</span>
-                      </div>
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 p-2">
-                        {TIME_SLOTS.map(time => {
-                          const key = slotKey(day, time);
-                          const checked = form.available_slots.includes(key);
-                          return (
-                            <label key={key} title={`${DAYS_ID[day]} - ${time.replace(/\s/g, "")}`}
-                              className={`flex items-center gap-2 px-2.5 py-1.5 rounded-md text-sm cursor-pointer border ${
-                                checked ? "bg-blue-50 border-blue-400 text-blue-900" : "bg-white border-slate-200 text-slate-700 hover:bg-slate-100"
-                              }`}
-                              style={{transitionProperty:"background-color,border-color",transitionDuration:"150ms"}}>
-                              <Checkbox data-testid={`slot-${day}-${time.replace(/[^0-9]/g,'')}`} checked={checked} onCheckedChange={()=>toggleSlot(key)}/>
-                              <span className="font-mono text-[11px] font-semibold">{time}</span>
-                            </label>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-              <p className="text-xs text-slate-500 mt-1.5">Contoh: "Senin - 10.00-11.00". Jam yang dicentang akan muncul di grid Jadwal Siswa untuk guru ini pada hari tersebut.</p>
-            </div>
+            <TeacherSlotPicker slots={form.available_slots} onChange={(available_slots) => setForm(f => ({ ...f, available_slots }))}/>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={()=>setOpen(false)}>Batal</Button>

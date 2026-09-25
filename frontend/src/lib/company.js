@@ -6,7 +6,7 @@ const DEFAULTS = {
   alamat: "Jl. Teratai No 19, Rawa Laut, Enggal, Tanjung Karang Timur, Bandar Lampung",
   bank_name: "BCA",
   bank_account_number: "4300961717",
-  bank_account_holder: "CV ARITA YASA NUSANTARA",
+  bank_account_holder: "CV ARTTA YASA NUSANTARA",
 };
 
 let cache = null;

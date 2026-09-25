@@ -30,15 +30,21 @@ const compact = (v) => {
   return `Rp${v}`;
 };
 
+const CHART_MARGIN = { top: 10, right: 10, left: 0, bottom: 0 };
+const TOOLTIP_CURSOR = { fill: "rgba(59,130,246,0.06)" };
+const TOOLTIP_STYLE = { borderRadius: 8, border: "1px solid #E2E8F0", background: "#fff" };
+const LEGEND_STYLE = { display: "none" };
+const BAR_RADIUS = [6, 6, 0, 0];
+
 export default function Dashboard() {
   const [stats, setStats] = useState(null);
   const [monthly, setMonthly] = useState([]);
 
   useEffect(() => {
-    api.get("/dashboard/stats").then((r) => setStats(r.data));
-    api.get("/dashboard/revenue-monthly").then((r) =>
-      setMonthly(r.data.map(d => ({ ...d, label: shortMonth(d.month) })))
-    );
+    api.get("/dashboard/stats").then((r) => setStats(r.data)).catch(() => setStats(null));
+    api.get("/dashboard/revenue-monthly")
+      .then((r) => setMonthly(r.data.map(d => ({ ...d, label: shortMonth(d.month) }))))
+      .catch(() => setMonthly([]));
   }, []);
 
   return (
@@ -69,18 +75,14 @@ export default function Dashboard() {
         </div>
         <div className="w-full h-72">
           <ResponsiveContainer>
-            <BarChart data={monthly} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+            <BarChart data={monthly} margin={CHART_MARGIN}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" vertical={false}/>
               <XAxis dataKey="label" stroke="#64748B" fontSize={12} tickLine={false} axisLine={false}/>
               <YAxis stroke="#64748B" fontSize={12} tickFormatter={compact} tickLine={false} axisLine={false}/>
-              <Tooltip
-                cursor={{ fill: "rgba(59,130,246,0.06)" }}
-                contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", background: "#fff" }}
-                formatter={(v) => fmtIDR(v)}
-              />
-              <Legend wrapperStyle={{ display: "none" }}/>
-              <Bar dataKey="paid" name="Paid" fill="#10B981" radius={[6,6,0,0]} maxBarSize={44}/>
-              <Bar dataKey="unpaid" name="Unpaid" fill="#FB7185" radius={[6,6,0,0]} maxBarSize={44}/>
+              <Tooltip cursor={TOOLTIP_CURSOR} contentStyle={TOOLTIP_STYLE} formatter={fmtIDR}/>
+              <Legend wrapperStyle={LEGEND_STYLE}/>
+              <Bar dataKey="paid" name="Paid" fill="#10B981" radius={BAR_RADIUS} maxBarSize={44}/>
+              <Bar dataKey="unpaid" name="Unpaid" fill="#FB7185" radius={BAR_RADIUS} maxBarSize={44}/>
             </BarChart>
           </ResponsiveContainer>
         </div>

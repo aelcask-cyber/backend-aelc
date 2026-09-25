@@ -82,8 +82,7 @@ export function ChangePasswordCard() {
     if (f.next !== f.confirm) return toast.error("Konfirmasi password tidak sama");
     setBusy(true);
     try {
-      const { data } = await api.post("/auth/change-password", { current_password: f.current, new_password: f.next, otp: f.otp });
-      if (data.token) localStorage.setItem("aelc_token", data.token);
+      await api.post("/auth/change-password", { current_password: f.current, new_password: f.next, otp: f.otp });
       setF({ current: "", next: "", confirm: "", otp: "" }); setSentTo("");
       toast.success("Password berhasil diubah. Sesi perangkat lain otomatis keluar.");
     } catch (e) { toast.error(formatApiError(e)); }

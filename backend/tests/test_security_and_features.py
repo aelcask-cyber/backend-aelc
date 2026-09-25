@@ -8,13 +8,9 @@ import requests
 from datetime import datetime, timezone, timedelta
 from pymongo import MongoClient
 
-BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "").rstrip("/")
-ADMIN_EMAIL = "aelc.ask@gmail.com"
-ADMIN_PASSWORD = "AelcAdmin2026"
+from conftest import BASE_URL, ADMIN_EMAIL, ADMIN_PASSWORD, MONGO_URL, DB_NAME  # noqa: F401
 
 # Use a dedicated mongo client here for seed/cleanup of otp_codes and login_attempts
-MONGO_URL = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
-DB_NAME = os.environ.get("DB_NAME", "test_database")
 mongo = MongoClient(MONGO_URL)
 db = mongo[DB_NAME]
 

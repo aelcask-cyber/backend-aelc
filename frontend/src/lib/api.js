@@ -8,17 +8,11 @@ const api = axios.create({
   withCredentials: true,
 });
 
-api.interceptors.request.use((cfg) => {
-  const t = localStorage.getItem("aelc_token");
-  if (t) cfg.headers.Authorization = `Bearer ${t}`;
-  return cfg;
-});
-
+// Autentikasi memakai cookie httpOnly (access_token) — token tidak disimpan di localStorage.
 api.interceptors.response.use(
   (r) => r,
   (err) => {
     if (err?.response?.status === 401 && !err.config?.url?.includes("/auth/login") && window.location.pathname !== "/login") {
-      localStorage.removeItem("aelc_token");
       window.location.replace("/login");
     }
     return Promise.reject(err);

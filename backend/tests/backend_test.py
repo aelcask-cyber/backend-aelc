@@ -3,9 +3,7 @@ import os
 import pytest
 import requests
 
-BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "https://zip-to-web-34.preview.emergentagent.com").rstrip("/")
-ADMIN_EMAIL = "aelc.ask@gmail.com"
-ADMIN_PASSWORD = "AelcAdmin2026"
+from conftest import BASE_URL, ADMIN_EMAIL, ADMIN_PASSWORD, MONGO_URL, DB_NAME  # noqa: F401
 
 
 @pytest.fixture(scope="session")
@@ -156,9 +154,13 @@ def test_dashboard_revenue(auth):
 def test_settings(auth):
     r = auth.get(f"{BASE_URL}/api/settings")
     assert r.status_code == 200
+    orig = r.json()
     payload = {"alamat": "TEST alamat", "bank_name": "BCA",
                "bank_account_number": "12345", "bank_account_holder": "TEST"}
-    r = auth.put(f"{BASE_URL}/api/settings/company", json=payload)
-    assert r.status_code == 200
-    r = auth.get(f"{BASE_URL}/api/settings")
-    assert r.json()["alamat"] == "TEST alamat"
+    try:
+        r = auth.put(f"{BASE_URL}/api/settings/company", json=payload)
+        assert r.status_code == 200
+        r = auth.get(f"{BASE_URL}/api/settings")
+        assert r.json()["alamat"] == "TEST alamat"
+    finally:
+        auth.put(f"{BASE_URL}/api/settings/company", json={k: orig.get(k, "") for k in payload})

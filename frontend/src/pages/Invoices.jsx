@@ -103,7 +103,6 @@ export default function Invoices() {
       URL.revokeObjectURL(url);
       toast.success(`ZIP ${folderName} berhasil diunduh`, { id: "zip" });
     } catch (e) {
-      console.error(e);
       toast.error("Gagal membuat ZIP", { id: "zip" });
     }
     setSavingAll(false);

@@ -43,6 +43,17 @@ export const teacherHasSlot = (slots, day, time) =>
 export const teacherTimes = (slots) =>
   TIME_SLOTS.filter((t) => (slots || []).some((s) => parseSlot(s).time === t));
 
+// Slot lama tanpa hari dikonversi menjadi slot per hari (semua hari).
+export const normalizeSlots = (slots) => {
+  const out = new Set();
+  (slots || []).forEach((s) => {
+    const p = parseSlot(s);
+    if (!TIME_SLOTS.includes(p.time)) return;
+    if (p.day) out.add(s); else DAYS.forEach((d) => out.add(slotKey(d, p.time)));
+  });
+  return sortSlots([...out]);
+};
+
 // Huruf awal setiap kata menjadi kapital, sisa huruf dibiarkan seperti diketik.
 export const capWords = (s) => String(s || "").replace(/(^|[\s\-/(])(\p{L})/gu, (m, pre, ch) => pre + ch.toUpperCase());
 

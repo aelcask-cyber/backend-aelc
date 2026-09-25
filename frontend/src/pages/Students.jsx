@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import api, { formatApiError } from "@/lib/api";
 import { fmtIDR, fmtDate, PROGRAM_KELAS, PROGRAM_BIMBEL, capWords } from "@/lib/format";
 import { toast } from "sonner";
@@ -23,11 +23,11 @@ export default function Students() {
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState(empty);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     try { const { data } = await api.get("/students"); setList(data); }
     catch (e) { toast.error(formatApiError(e)); }
-  };
-  useEffect(() => { load(); }, []);
+  }, []);
+  useEffect(() => { load(); }, [load]);
 
   const openAdd = () => { setEditing(null); setForm(empty); setOpen(true); };
   const openEdit = (s) => {

@@ -521,7 +521,7 @@ async def revenue_monthly(user: dict = Depends(get_current_user)):
             buckets[key]["paid"] += total
         else:
             buckets[key]["unpaid"] += total
-    return [buckets[m] for m in months]
+    return [buckets[mk] for mk in months]
 
 # ============ SETTINGS ============
 class LogoBody(BaseModel):
@@ -535,7 +535,7 @@ async def get_settings(user: dict = Depends(get_current_user)):
         "alamat": doc.get("alamat", "Jl. Teratai No 19, Rawa Laut, Enggal, Tanjung Karang Timur, Bandar Lampung"),
         "bank_name": doc.get("bank_name", "BCA"),
         "bank_account_number": doc.get("bank_account_number", "4300961717"),
-        "bank_account_holder": doc.get("bank_account_holder", "CV ARITA YASA NUSANTARA"),
+        "bank_account_holder": doc.get("bank_account_holder", "CV ARTTA YASA NUSANTARA"),
     }
 
 @api.put("/settings/company")
