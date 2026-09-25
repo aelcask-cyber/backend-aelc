@@ -1,0 +1,39 @@
+{
+  "summary": "Pre-release full regression (backend + frontend, desktop 1920x1080 + mobile 390x844). Backend: 33/33 pytest passed (21 existing + 12 new regression covering unauth 401 across 8 endpoints, invoice -2 suffix on 2nd allocation of same student, manual duplicate invoice 409, cascade delete for student & teacher removing allocations+schedules, settings persistence). All previously verified security features (login lockout->423, backup-email requires current password, request-otp rate limit 429, change-password weak/wrong-otp validation, happy path + restore) re-verified. Frontend: login wrong-pw shows 'Email atau password salah (4 percobaan tersisa)' ✓, correct login redirects to dashboard, stats cards & 6-month revenue chart render ✓. Data Siswa: capWords auto-applied ('test siswa auto'→'Test Siswa Auto'), search, Excel export, delete all OK. Data Guru: day-all Senin (7 slots), 2 individual Selasa slots persist on re-open (Senin aria-checked=true, Selasa=mixed indicating indeterminate = correct). Jadwal Siswa: teacher select, unavailable cells show '—' (13 shown), add-schedule cells (23), Cetak PDF and Export Excel both download named files. Invoice: BILL TO order verified (Nama → tanggal lahir → sekolah → HP), no 'Tgl. Lahir' prefix, no 'Guru:' line. Siswa per Guru: summary cards render, Cetak Laporan PDF downloads ('Laporan-Pendapatan-Semua-Guru-2026-09-25.pdf'), Bulk Reminder Unpaid dialog opens without crash. Pengaturan: backup-email-card and change-password-card render; mismatched confirm password shows client validation. Logout works and protected routes redirect to /login. Zero page errors, zero JS console errors post-login on any page. Cleaned db.login_attempts at end.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Mobile (390px width) — Dashboard, Data Siswa, and other pages", "issues": [
+        "Sidebar (Bimbel AELC nav) is permanently expanded at ~260px width even on mobile viewports, leaving only ~130px of usable content area — the main content therefore horizontally overflows (Dashboard scrollWidth=522 vs clientWidth=390; Data Siswa scrollWidth=592 vs 390). Stat card values like 'Rp 1.180.000' and the students table are clipped and require horizontal scroll. There is no hamburger/drawer toggle to collapse the sidebar on small screens.",
+        "Consequence: page titles ('Data Keseluruhan Siswa') and action buttons (Export Excel, +Tambah Siswa) get pushed off-screen; forms in dialogs may also overflow.",
+        "Recommendation: add a responsive Sheet/Drawer sidebar that collapses below md breakpoint with a hamburger trigger in the header, or hide the sidebar and make the top nav a bottom-nav on mobile."
+      ]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/backend_test.py",
+    "/app/backend/tests/test_security_and_features.py",
+    "/app/backend/tests/test_regression_prerelease.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "MOBILE ONLY: Implement collapsible sidebar/drawer for viewports <768px so content is not clipped and horizontal scroll disappears. All other pre-release checks are clean."
+  ],
+  "critical_code_review_comments": [
+    "server.py is 614 lines — approaching the 700-line threshold; consider splitting into modules (auth.py, students.py, allocations.py, schedules.py, settings.py) before the next feature addition.",
+    "next_invoice_no() computes `count` using regex against year prefix but returns a format using month ({FirstName}-INV-AELC-{MM}-{no_urut}), so `count` is only used for the fallback branch (no student_id). Minor inconsistency but not user-facing.",
+    "Layout.jsx sidebar is not responsive — no lg/md breakpoint hiding or drawer variant. Only design issue in an otherwise clean codebase."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_regression_prerelease.py (NEW: 12 regression tests for unauth guards, invoice -2 suffix, cascade delete, settings persistence)"
+  ],
+  "success_rate": {"backend": "100% (33/33)", "frontend": "100% desktop, mobile has 1 responsive-layout design issue"},
+  "test_credentials": "aelc.ask@gmail.com / AelcAdmin2026 (from /app/memory/test_credentials.md). Admin password NOT permanently changed — happy-path change-password test restores to original. db.login_attempts cleared at end.",
+  "seed_data_creation": "None persisted. All TEST_-prefixed students/teachers/allocations/schedules created during tests were deleted in teardown. Temporary 'Test Siswa Auto' and 'Test Guru Slots' from Playwright flow were deleted at end of their respective flows.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "All backend endpoints and desktop UI flows are pre-release ready. The only remaining gap is responsive sidebar behaviour on <768px. If main agent adds a drawer/hamburger, the fix can be self-verified by loading /siswa at 390x844 and checking that document.documentElement.scrollWidth === clientWidth (390) and the Export Excel + Tambah Siswa buttons are visible in the initial viewport. Backend regression suite (33 tests) runs in ~11s: `REACT_APP_BACKEND_URL=$(grep REACT_APP_BACKEND_URL /app/frontend/.env|cut -d= -f2) pytest /app/backend/tests/ -v`.",
+  "rca of the issue": "Mobile overflow RCA — /app/frontend/src/pages/Layout.jsx renders a fixed-width `<aside>` sidebar with no responsive class (no hidden md:block or Sheet/drawer wrapper). At 390px, the sidebar occupies ~260px, the main flex child cannot shrink below its intrinsic content width (stat cards, table minWidth), so document scrolls horizontally. Reproduction: set viewport to 390x844, open /siswa → scrollWidth (592) > clientWidth (390). Mitigation: wrap sidebar in a responsive Sheet component (shadcn) triggered by a hamburger button, apply `hidden md:flex` to the desktop aside and `md:hidden` header trigger on mobile."
+}

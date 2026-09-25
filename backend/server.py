@@ -482,7 +482,7 @@ async def dashboard_stats(user: dict = Depends(get_current_user)):
     total_guru = await db.teachers.count_documents({})
     total_unpaid = await db.allocations.count_documents({"payment_status": "Unpaid"})
 
-    allocs = await db.allocations.find({}, {"_id": 0}).to_list(5000)
+    allocs = await db.allocations.find({}, {"_id": 0, "biaya": 1, "harga_buku": 1, "payment_status": 1}).to_list(5000)
     pendapatan = sum(_alloc_total(a) for a in allocs if a.get("payment_status") == "Paid")
     outstanding = sum(_alloc_total(a) for a in allocs if a.get("payment_status") == "Unpaid")
 
@@ -507,7 +507,7 @@ async def revenue_monthly(user: dict = Depends(get_current_user)):
             y -= 1
         months.append(f"{y:04d}-{m:02d}")
 
-    allocs = await db.allocations.find({}, {"_id": 0}).to_list(5000)
+    allocs = await db.allocations.find({}, {"_id": 0, "created_at": 1, "biaya": 1, "harga_buku": 1, "payment_status": 1}).to_list(5000)
     buckets = {mk: {"month": mk, "paid": 0, "unpaid": 0} for mk in months}
     for a in allocs:
         ca = a.get("created_at")
@@ -567,7 +567,7 @@ async def startup():
     await db.users.create_index("email", unique=True)
     await db.students.create_index("no_urut")
     await db.login_attempts.create_index("identifier", unique=True)
-    await db.otp_codes.create_index("expires_at", expireAfterSeconds=0)
+    await db.otp_codes.create_index("expires_at")
     await db.schedules.create_index([("teacher_id", 1), ("day", 1), ("time_slot", 1)])
 
     admin_email = os.environ.get("ADMIN_EMAIL", "admin@example.com").lower()

@@ -40,6 +40,8 @@ User meng-upload zip berisi proyek Emergent "Bimbel AELC" dan meminta: "tolong b
 
 - **25 Sep 2026 (batch 8)**: Footer tabel Laporan Pendapatan → "GRAND TOTAL PAID" (hanya Paid, hijau); header kanan atas tetap Paid + Unpaid.
 
+- **25 Sep 2026 (pre-release)**: Regresi penuh testing agent iteration_8: backend 33/33 PASS, frontend desktop + mobile PASS, 0 console error. Deployment agent PASS setelah fix: TTL index otp_codes dihapus (cleanup manual saat verifikasi/request), projeksi query dashboard.
+
 ## Backlog / Next Tasks
 - P1: Halaman kelola akun admin tambahan (multi-user internal) — saat ini hanya 1 admin seeded
 - P2: Migrasi `@app.on_event` ke lifespan handler (deprecasi FastAPI)
