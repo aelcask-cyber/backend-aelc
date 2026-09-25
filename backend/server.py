@@ -384,18 +384,26 @@ async def delete_teacher(tid: str, user: dict = Depends(get_current_user)):
     return {"ok": True}
 
 # ============ ALLOCATIONS ============
+async def unique_invoice_no(base: str, exclude_id: str = "") -> str:
+    """Tambah akhiran -2, -3, ... jika nomor sudah dipakai alokasi lain."""
+    candidate, n = base, 1
+    while await db.allocations.find_one({"no_invoice": candidate, "id": {"$ne": exclude_id}}):
+        n += 1
+        candidate = f"{base}-{n}"
+    return candidate
+
 async def next_invoice_no(student_id: str = "") -> str:
-    """Format: {FirstName}-INV-AELC-{MM}-{no_urut}"""
+    """Format: {FirstName}-INV-AELC-{MM}-{no_urut}[-n]"""
     mm = datetime.now(timezone.utc).strftime("%m")
     if student_id:
         st = await db.students.find_one({"id": student_id})
         if st:
             first_name = (st.get("nama") or "").split()[0] if st.get("nama") else "Siswa"
             first_name = first_name.replace(" ", "")
-            return f"{first_name}-INV-AELC-{mm}-{st.get('no_urut', 0)}"
+            return await unique_invoice_no(f"{first_name}-INV-AELC-{mm}-{st.get('no_urut', 0)}")
     year = datetime.now(timezone.utc).year
     count = await db.allocations.count_documents({"no_invoice": {"$regex": f"INV-AELC-{year}-"}})
-    return f"INV-AELC-{mm}-{(count + 1):04d}"
+    return await unique_invoice_no(f"INV-AELC-{mm}-{(count + 1):04d}")
 
 @api.get("/allocations")
 async def list_allocations(user: dict = Depends(get_current_user)):
@@ -406,6 +414,8 @@ async def create_allocation(body: AllocationCreate, user: dict = Depends(get_cur
     data = body.model_dump()
     if not data.get("no_invoice"):
         data["no_invoice"] = await next_invoice_no(data.get("student_id", ""))
+    elif await db.allocations.find_one({"no_invoice": data["no_invoice"]}):
+        raise HTTPException(409, f"Nomor invoice {data['no_invoice']} sudah digunakan")
     a = Allocation(**data)
     await db.allocations.insert_one(a.model_dump())
     return a.model_dump()
@@ -418,6 +428,8 @@ async def update_allocation(aid: str, body: AllocationCreate, user: dict = Depen
     if not data.get("no_invoice"):
         existing = await db.allocations.find_one({"id": aid})
         data["no_invoice"] = existing.get("no_invoice") or await next_invoice_no(data.get("student_id", ""))
+    elif await db.allocations.find_one({"no_invoice": data["no_invoice"], "id": {"$ne": aid}}):
+        raise HTTPException(409, f"Nomor invoice {data['no_invoice']} sudah digunakan alokasi lain")
     await db.allocations.update_one({"id": aid}, {"$set": data})
     return clean(await db.allocations.find_one({"id": aid}, {"_id": 0}))
 

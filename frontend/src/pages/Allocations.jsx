@@ -335,7 +335,7 @@ export default function Allocations() {
               <Input data-testid="alloc-form-buku" value={form.buku} onChange={(e)=>setForm({...form, buku:e.target.value})} placeholder="cth: Matematika SD 5"/>
             </div>
             <div><Label>Harga Buku (Rp)</Label><Input data-testid="alloc-form-harga-buku" type="number" value={form.harga_buku} onChange={(e)=>setForm({...form, harga_buku:e.target.value})}/></div>
-            <div><Label>No Invoice</Label><Input data-testid="alloc-form-invoice" placeholder="Kosongkan → auto: {Nama}-INV-AELC-{Bulan}-{No}" value={form.no_invoice} onChange={(e)=>setForm({...form, no_invoice:e.target.value})}/></div>
+            <div><Label>No Invoice</Label><Input data-testid="alloc-form-invoice" placeholder="Kosongkan → auto: {Nama}-INV-AELC-{Bulan}-{No} (+ -2, -3 jika sudah ada)" value={form.no_invoice} onChange={(e)=>setForm({...form, no_invoice:e.target.value})}/></div>
             <div>
               <Label>Pembayaran</Label>
               <Select value={form.payment_status} onValueChange={(v)=>setForm({...form, payment_status:v})}>
