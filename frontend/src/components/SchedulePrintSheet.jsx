@@ -34,11 +34,11 @@ export function SchedulePrintSheet({ teacher, times, getCell, studentMap, isAvai
                     {items.map(s => {
                       const st = studentMap[s.student_id];
                       return (
-                        <div key={s.id} style={{ background: "#EFF6FF", border: "1px solid #BFDBFE", borderRadius: 6, padding: "4px 8px", marginBottom: 4 }}>
-                          <div style={{ fontWeight: 700, color: "#1E3A8A", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                            {st ? `#${st.no_urut} ${shortName(st.nama)}` : "Siswa terhapus"}
+                        <div key={s.id} style={{ background: "#EFF6FF", border: "1px solid #BFDBFE", borderRadius: 6, padding: "6px 8px", marginBottom: 4, lineHeight: 1.5 }}>
+                          <div style={{ fontWeight: 700, color: "#1E3A8A", wordBreak: "break-word" }}>
+                            {st ? shortName(st.nama) : "Siswa terhapus"}
                           </div>
-                          {st?.kelas && <div style={{ fontSize: 11, color: "#1D4ED8" }}>{st.kelas}</div>}
+                          {st?.kelas && <div style={{ fontSize: 11, color: "#1D4ED8", lineHeight: 1.5 }}>{st.kelas}</div>}
                         </div>
                       );
                     })}

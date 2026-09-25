@@ -34,6 +34,8 @@ User meng-upload zip berisi proyek Emergent "Bimbel AELC" dan meminta: "tolong b
 
 - **25 Sep 2026 (batch 5)**: Bug Cetak PDF jadwal terpotong (html2canvas menangkap container scroll → kolom Senin & judul terpotong, tombol "+ Tambah" ikut tercetak). Fix: render offscreen `SchedulePrintSheet` (lebar tetap 1400px, tanpa tombol), halaman PDF pas konten (lebar 297mm). Tombol → "Cetak PDF"; tambah "Export Excel" (xlsx: Waktu × Senin–Sabtu). Testing agent iteration_7: PASS.
 
+- **25 Sep 2026 (batch 6)**: Kartu jadwal (layar, PDF, Excel) hanya menampilkan Nama + Kelas (tanpa #no_urut). Teks nama di PDF terpotong setengah karena `overflow:hidden + nowrap + ellipsis` di html2canvas → diganti `wordBreak` + `lineHeight 1.5`. Diverifikasi render PDF via pymupdf.
+
 ## Backlog / Next Tasks
 - P1: Halaman kelola akun admin tambahan (multi-user internal) — saat ini hanya 1 admin seeded
 - P2: Migrasi `@app.on_event` ke lifespan handler (deprecasi FastAPI)

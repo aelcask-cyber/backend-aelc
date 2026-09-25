@@ -102,7 +102,7 @@ export default function Schedules() {
       time,
       ...DAYS.map(day => getCell(day, time).map(s => {
         const st = studentMap[s.student_id];
-        return st ? `#${st.no_urut} ${st.nama}${st.kelas ? ` (${st.kelas})` : ""}` : "Siswa terhapus";
+        return st ? `${st.nama}${st.kelas ? ` (${st.kelas})` : ""}` : "Siswa terhapus";
       }).join("\n")),
     ]);
     const ws = XLSX.utils.aoa_to_sheet([[`Jadwal Mingguan — ${activeTeacherObj?.nama || ""}`], [], header, ...rows]);
@@ -192,8 +192,8 @@ export default function Schedules() {
                                 <div key={s.id} data-testid={`schedule-card-${s.id}`} className="group bg-blue-50 border border-blue-200 rounded-lg px-2.5 py-2 text-xs">
                                   <div className="flex items-start justify-between gap-1">
                                     <div className="flex-1 min-w-0">
-                                      <div className="font-semibold text-blue-900 truncate" title={st?.nama}>
-                                        {st ? `#${st.no_urut} ${shortName(st.nama)}` : <span className="text-rose-600 italic">Siswa terhapus</span>}
+                                      <div className="font-semibold text-blue-900 leading-snug break-words" title={st?.nama}>
+                                        {st ? shortName(st.nama) : <span className="text-rose-600 italic">Siswa terhapus</span>}
                                       </div>
                                       <div className="text-blue-700 text-[11px]">{st?.kelas}</div>
                                     </div>
