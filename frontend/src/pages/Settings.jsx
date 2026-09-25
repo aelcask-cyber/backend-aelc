@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Upload, Trash2, GraduationCap, Save, Landmark } from "lucide-react";
 import { setLogo as broadcastLogo } from "@/lib/logo";
 import { setCompanyPatch, BANK_OPTIONS } from "@/lib/company";
+import { BackupEmailCard, ChangePasswordCard } from "@/components/SecuritySettings";
 
 export default function Settings() {
   const [logo, setLogo] = useState("");
@@ -82,7 +83,19 @@ export default function Settings() {
     <div className="p-6 lg:p-8 space-y-6 max-w-3xl">
       <div>
         <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">Pengaturan</h1>
-        <p className="text-sm text-slate-500 mt-1">Kelola logo, alamat, dan informasi rekening pembayaran.</p>
+        <p className="text-sm text-slate-500 mt-1">Kelola logo, alamat, informasi rekening pembayaran, dan keamanan akun.</p>
+      </div>
+
+      <div className="flex items-center gap-2 pt-2">
+        <div className="text-xs font-bold uppercase tracking-wider text-slate-500">Keamanan Akun</div>
+        <div className="flex-1 border-t border-slate-200"/>
+      </div>
+      <BackupEmailCard/>
+      <ChangePasswordCard/>
+
+      <div className="flex items-center gap-2 pt-2">
+        <div className="text-xs font-bold uppercase tracking-wider text-slate-500">Perusahaan</div>
+        <div className="flex-1 border-t border-slate-200"/>
       </div>
 
       <div className="bg-white border border-slate-200 rounded-xl p-6 space-y-6">

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import api, { formatApiError } from "@/lib/api";
-import { DAYS, DAYS_ID } from "@/lib/format";
+import { DAYS, DAYS_ID, TIME_SLOTS, teacherHasSlot, teacherTimes, shortName } from "@/lib/format";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -49,22 +49,27 @@ export default function Schedules() {
   const save = async () => {
     if (!activeTeacher || !form.student_id) return toast.error("Pilih siswa");
     try {
-      await api.post("/schedules", { ...form, teacher_id: activeTeacher });
-      toast.success("Jadwal ditambahkan"); setOpen(false); load();
+      const { data } = await api.post("/schedules", { day: form.day, time_slot: form.time_slot, student_id: form.student_id, teacher_id: activeTeacher });
+      setSchedules(prev => [...prev.filter(s => s.id !== data.id), data]);
+      toast.success(`Jadwal ${DAYS_ID[form.day]} ${form.time_slot} tersimpan`); setOpen(false);
     } catch (e) { toast.error(formatApiError(e)); }
   };
 
   const remove = async (id) => {
-    try { await api.delete(`/schedules/${id}`); toast.success("Jadwal dihapus"); load(); }
+    try {
+      await api.delete(`/schedules/${id}`);
+      setSchedules(prev => prev.filter(s => s.id !== id));
+      toast.success("Jadwal dihapus");
+    }
     catch (e) { toast.error(formatApiError(e)); }
   };
 
   const filtered = schedules.filter(s => s.teacher_id === activeTeacher);
   const getCell = (day, time) => filtered.filter(s => s.day === day && s.time_slot === time);
 
-  const teacherSlots = Array.isArray(activeTeacherObj?.available_slots) && activeTeacherObj.available_slots.length > 0
-    ? activeTeacherObj.available_slots
-    : [];
+  const availableSlots = Array.isArray(activeTeacherObj?.available_slots) ? activeTeacherObj.available_slots : [];
+  // Baris grid = jam mengajar guru + jam yang sudah ada jadwalnya (agar tidak ada jadwal tersembunyi)
+  const teacherSlots = TIME_SLOTS.filter(t => teacherTimes(availableSlots).includes(t) || filtered.some(s => s.time_slot === t));
 
   const printPDF = async () => {
     if (!activeTeacher) return toast.error("Pilih guru dulu");
@@ -138,14 +143,14 @@ export default function Schedules() {
           <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-2.5 text-sm">
             Menampilkan jadwal untuk <span className="font-bold text-blue-900">{activeTeacherObj?.nama}</span>
             {activeTeacherObj?.mata_pelajaran && <span className="text-blue-700"> · {activeTeacherObj.mata_pelajaran}</span>}
-            <span className="text-blue-700"> · {assignedStudents.length} siswa dialokasikan · {teacherSlots.length} slot jam</span>
+            <span className="text-blue-700"> · {assignedStudents.length} siswa dialokasikan · {availableSlots.length} slot jam · {filtered.length} jadwal</span>
           </div>
 
           {teacherSlots.length === 0 ? (
             <div className="bg-white border border-dashed border-amber-300 bg-amber-50/50 rounded-xl p-10 text-center">
               <Clock className="h-10 w-10 text-amber-400 mx-auto mb-2"/>
-              <p className="text-sm text-slate-700 font-semibold">Belum ada jam siap mengajar</p>
-              <p className="text-xs text-slate-500 mt-1">Buka menu <span className="font-semibold">Data Guru → Edit</span> untuk mengatur jam siap mengajar guru ini.</p>
+              <p className="text-sm text-slate-700 font-semibold">Belum ada jam mengajar</p>
+              <p className="text-xs text-slate-500 mt-1">Buka menu <span className="font-semibold">Data Guru → Edit</span> untuk mengatur jam mengajar guru ini.</p>
             </div>
           ) : (
           <div ref={printRef} className="bg-white border border-slate-200 rounded-xl overflow-x-auto" style={{ scrollbarGutter: "stable" }}>
@@ -166,16 +171,19 @@ export default function Schedules() {
                     <td className="px-4 py-3 font-mono text-xs text-slate-700 font-semibold bg-slate-50/50">{time}</td>
                     {DAYS.map(day => {
                       const items = getCell(day, time);
+                      const available = teacherHasSlot(availableSlots, day, time);
                       return (
-                        <td key={day} className="px-2 py-2 align-top border-l border-slate-100 min-w-[140px]">
+                        <td key={day} className={`px-2 py-2 align-top border-l border-slate-100 min-w-[140px] ${available ? "" : "bg-slate-50/70"}`}>
                           <div className="space-y-1.5">
                             {items.map(s => {
                               const st = studentMap[s.student_id];
                               return (
-                                <div key={s.id} className="group bg-blue-50 border border-blue-200 rounded-lg px-2.5 py-2 text-xs">
+                                <div key={s.id} data-testid={`schedule-card-${s.id}`} className="group bg-blue-50 border border-blue-200 rounded-lg px-2.5 py-2 text-xs">
                                   <div className="flex items-start justify-between gap-1">
                                     <div className="flex-1 min-w-0">
-                                      <div className="font-semibold text-blue-900 truncate">#{st?.no_urut} {st?.nama || "?"}</div>
+                                      <div className="font-semibold text-blue-900 truncate" title={st?.nama}>
+                                        {st ? `#${st.no_urut} ${shortName(st.nama)}` : <span className="text-rose-600 italic">Siswa terhapus</span>}
+                                      </div>
                                       <div className="text-blue-700 text-[11px]">{st?.kelas}</div>
                                     </div>
                                     <button data-testid={`delete-schedule-${s.id}`} onClick={()=>remove(s.id)}
@@ -187,11 +195,15 @@ export default function Schedules() {
                                 </div>
                               );
                             })}
-                            <button data-testid={`add-schedule-${day}-${time}`} onClick={()=>openAdd(day, time)}
-                              className="w-full flex items-center justify-center gap-1 py-1.5 rounded-md border border-dashed border-slate-300 text-slate-400 hover:border-blue-400 hover:text-blue-600 text-xs"
-                              style={{transitionProperty:"border-color,color",transitionDuration:"150ms"}}>
-                              <Plus className="h-3 w-3"/> Tambah
-                            </button>
+                            {available ? (
+                              <button data-testid={`add-schedule-${day}-${time}`} onClick={()=>openAdd(day, time)}
+                                className="w-full flex items-center justify-center gap-1 py-1.5 rounded-md border border-dashed border-slate-300 text-slate-400 hover:border-blue-400 hover:text-blue-600 text-xs"
+                                style={{transitionProperty:"border-color,color",transitionDuration:"150ms"}}>
+                                <Plus className="h-3 w-3"/> Tambah
+                              </button>
+                            ) : items.length === 0 && (
+                              <div data-testid={`unavailable-${day}-${time}`} className="text-center text-[10px] text-slate-300 py-1.5 select-none">—</div>
+                            )}
                           </div>
                         </td>
                       );

@@ -8,13 +8,6 @@ export function AuthProvider({ children }) {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    // CRITICAL: If returning from Emergent OAuth callback, skip the /me check.
-    // AuthCallback will exchange the session_id and establish the session first.
-    if (typeof window !== "undefined" && window.location.hash?.includes("session_id=")) {
-      return;
-    }
-    const token = localStorage.getItem("aelc_token");
-    // Even without a JWT token, try /me because the Emergent session cookie may exist
     api.get("/auth/me")
       .then((r) => setUser(r.data))
       .catch(() => {
@@ -36,8 +29,8 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const finalizeGoogle = (userObj) => {
-    setUser(userObj);
+  const refreshUser = async () => {
+    try { const { data } = await api.get("/auth/me"); setUser(data); } catch {}
   };
 
   const logout = async () => {
@@ -47,7 +40,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, error, finalizeGoogle }}>
+    <AuthContext.Provider value={{ user, login, logout, error, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

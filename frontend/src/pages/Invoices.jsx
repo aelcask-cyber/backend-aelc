@@ -52,15 +52,11 @@ export default function Invoices() {
   const generatePdfBlob = async (targetEl) => {
     const canvas = await html2canvas(targetEl, { scale: 2, backgroundColor: "#ffffff" });
     const imgData = canvas.toDataURL("image/png");
-    const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-    const pageW = 210, pageH = 297;
-    const imgW = pageW;
-    const imgH = (canvas.height * imgW) / canvas.width;
-    if (imgH <= pageH) {
-      pdf.addImage(imgData, "PNG", 0, 0, imgW, imgH);
-    } else {
-      pdf.addImage(imgData, "PNG", 0, 0, imgW, pageH);
-    }
+    // Ukuran halaman PDF mengikuti rasio area invoice (lebar A4 210mm) — tanpa sisa ruang kosong
+    const pageW = 210;
+    const pageH = (canvas.height * pageW) / canvas.width;
+    const pdf = new jsPDF({ orientation: pageH > pageW ? "portrait" : "landscape", unit: "mm", format: [pageW, pageH] });
+    pdf.addImage(imgData, "PNG", 0, 0, pageW, pageH);
     return pdf.output("blob");
   };
 
@@ -160,8 +156,8 @@ export default function Invoices() {
       )}
 
       {alloc && (
-        <div className="bg-white border border-slate-200 rounded-xl p-4 sm:p-6">
-          <div ref={invoiceRef} data-testid="invoice-preview" className="invoice-print bg-white p-8 sm:p-12" style={{ color: "#0F172A" }}>
+        <div className="bg-white border border-slate-200 rounded-xl p-4 sm:p-6 overflow-x-auto">
+          <div ref={invoiceRef} data-testid="invoice-preview" className="invoice-print bg-white p-10 mx-auto" style={{ color: "#0F172A", width: 900 }}>
             <InvoiceBody logo={logo} company={company} alloc={alloc} student={student} teacher={teacher}
                          totalBiaya={totalBiaya} totalBuku={totalBuku} grandTotal={grandTotal} invoiceDate={invoiceDate}/>
           </div>
@@ -215,9 +211,10 @@ function InvoiceBody({ logo, company, alloc, student, teacher, totalBiaya, total
       </div>
 
       <div className="grid grid-cols-2 gap-6 mt-6">
-        <div>
+        <div data-testid="invoice-bill-to">
           <div className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Bill To</div>
           <div className="text-base font-bold text-slate-900">{student?.nama}</div>
+          <div className="text-sm text-slate-600">Tgl. Lahir: {fmtDate(student?.tanggal_lahir)}</div>
           <div className="text-sm text-slate-600">{student?.asal_sekolah || "-"}</div>
           <div className="text-sm text-slate-600">{student?.no_hp}</div>
         </div>

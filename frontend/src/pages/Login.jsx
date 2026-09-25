@@ -4,10 +4,7 @@ import { Navigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { GraduationCap, Loader2, Eye, EyeOff } from "lucide-react";
-
-// REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
-const GOOGLE_ICON = "https://www.google.com/favicon.ico";
+import { GraduationCap, Loader2, Eye, EyeOff, ShieldCheck } from "lucide-react";
 
 export default function Login() {
   const { user, login, error } = useAuth();
@@ -15,12 +12,6 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [busy, setBusy] = useState(false);
-
-  const loginWithGoogle = () => {
-    // REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
-    const redirectUrl = window.location.origin + "/";
-    window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
-  };
 
   if (user) return <Navigate to="/" replace />;
 
@@ -96,16 +87,10 @@ export default function Login() {
             {busy ? <><Loader2 className="mr-2 h-4 w-4 animate-spin"/> Memproses...</> : "Masuk"}
           </Button>
 
-          <div className="relative py-2">
-            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-200"/></div>
-            <div className="relative flex justify-center"><span className="bg-white px-3 text-xs uppercase tracking-widest text-slate-400 font-semibold">atau</span></div>
+          <div className="flex items-start gap-2 text-xs text-slate-500 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2" data-testid="login-internal-notice">
+            <ShieldCheck className="h-4 w-4 text-blue-600 shrink-0 mt-0.5"/>
+            <span>Aplikasi internal khusus kantor Bimbel AELC. Akun terkunci 15 menit setelah 5x salah password. Sesi berakhir otomatis setelah 8 jam.</span>
           </div>
-
-          <Button data-testid="google-login-btn" type="button" onClick={loginWithGoogle} variant="outline"
-                  className="w-full h-11 font-semibold border-slate-300 hover:bg-slate-50 text-slate-700">
-            <img src={GOOGLE_ICON} alt="" className="h-4 w-4 mr-2"/>
-            Masuk dengan Google
-          </Button>
 
           <p className="text-xs text-slate-400 text-center">Hubungi administrator untuk akses akun baru.</p>
         </form>

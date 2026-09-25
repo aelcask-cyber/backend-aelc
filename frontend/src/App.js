@@ -1,5 +1,5 @@
 import "@/App.css";
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { Toaster } from "sonner";
 import Login from "@/pages/Login";
@@ -11,7 +11,6 @@ import Allocations from "@/pages/Allocations";
 import Schedules from "@/pages/Schedules";
 import Invoices from "@/pages/Invoices";
 import Settings from "@/pages/Settings";
-import AuthCallback from "@/pages/AuthCallback";
 import { Loader2 } from "lucide-react";
 
 function Protected({ children }) {
@@ -28,11 +27,6 @@ function Protected({ children }) {
 }
 
 function AppRouter() {
-  const location = useLocation();
-  // Detect OAuth callback synchronously during render (prevents race with ProtectedRoute)
-  if (location.hash?.includes("session_id=")) {
-    return <AuthCallback />;
-  }
   return (
     <Routes>
       <Route path="/login" element={<Login />} />

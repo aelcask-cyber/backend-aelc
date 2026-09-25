@@ -14,6 +14,17 @@ api.interceptors.request.use((cfg) => {
   return cfg;
 });
 
+api.interceptors.response.use(
+  (r) => r,
+  (err) => {
+    if (err?.response?.status === 401 && !err.config?.url?.includes("/auth/login") && window.location.pathname !== "/login") {
+      localStorage.removeItem("aelc_token");
+      window.location.replace("/login");
+    }
+    return Promise.reject(err);
+  }
+);
+
 export function formatApiError(err) {
   const d = err?.response?.data?.detail;
   if (!d) return err?.message || "Terjadi kesalahan.";
