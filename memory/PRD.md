@@ -1,39 +1,31 @@
-# Bimbel AELC — PRD
+# PRD - Bimbel AELC Admin Portal
 
-## Original Problem Statement
-Aplikasi web full-stack untuk operasional administrasi Bimbingan Belajar "Bimbel AELC" milik CV ARITA YASA NUSANTARA. Dashboard admin modern dengan 4 modul utama: Master Data Siswa, Data Siswa per Guru, Jadwal Mingguan, dan Invoice Penagihan (Save-to-PDF + Send-to-WhatsApp).
+## Problem Statement (Original)
+User meng-upload zip berisi proyek Emergent "Bimbel AELC" dan meminta: "tolong baca zip ini jadikan app web". Source code dipulihkan dari git history di dalam zip (working tree terhapus) dan di-deploy sebagai web app.
 
 ## User Personas
-- **Admin Operasional Bimbel**: mengelola data siswa/guru, alokasi pengajaran, jadwal, dan menagih pembayaran via invoice PDF & WhatsApp.
+- **Admin Bimbel**: mengelola data siswa, guru, alokasi siswa-guru, jadwal mingguan, invoice, dan pengaturan perusahaan.
 
 ## Core Requirements (Static)
-1. Master Data Siswa CRUD (No Urut auto, Nama, Tgl Lahir, Kelas, Sekolah, Program Kelas, Program Bimbel, Biaya, No HP, Status).
-2. Master Data Guru CRUD.
-3. Alokasi Siswa per Guru dengan No Invoice auto-generate & status Paid/Unpaid.
-4. Jadwal mingguan Senin–Jumat, grid time-slot × hari, sumber data dari alokasi.
-5. Invoice dinamis dengan header CV ARITA YASA NUSANTARA, Bank BCA, tombol Save-to-PDF (jsPDF+html2canvas) & Send-to-WhatsApp (wa.me link).
-6. JWT admin auth, semua endpoint /api prefix.
+- Login admin (JWT email/password + Emergent Google Auth)
+- Dashboard statistik + grafik pendapatan 6 bulan
+- CRUD Data Siswa (no_urut otomatis)
+- CRUD Data Guru
+- Alokasi Siswa per Guru dengan nomor invoice otomatis `{NamaDepan}-INV-AELC-{MM}-{no_urut}` + toggle Paid/Unpaid
+- Jadwal mingguan (Senin-Sabtu)
+- Invoice: unduh PDF (jsPDF) + kirim via WhatsApp (wa.me)
+- Pengaturan: info perusahaan (alamat, bank) + upload logo
 
-## Architecture / Tech
-- **Backend**: FastAPI + Motor (MongoDB), bcrypt+PyJWT auth, semua model UUID string.
-- **Frontend**: React 19, react-router 7, shadcn/ui + Tailwind, sonner toasts, jsPDF+html2canvas untuk PDF.
-- **DB**: MongoDB `bimbel_aelc` (users, students, teachers, allocations, schedules).
+## Arsitektur
+- Frontend: React (CRA/craco) + Tailwind + shadcn/ui, `/app/frontend/src/pages/*`
+- Backend: FastAPI `/app/backend/server.py`, semua route prefix `/api`
+- DB: MongoDB (MONGO_URL, DB_NAME=test_database)
 
-## Implemented (2026-02-24)
-- JWT login (admin seeded: aelc.ask@gmail.com / AelcAdmin2026)
-- Sidebar layout + Dashboard KPI (6 stat cards)
-- Master Data Siswa: CRUD, search, filter status, no_urut auto-increment
-- Master Data Guru: CRUD
-- Alokasi Siswa per Guru: CRUD, auto no_invoice INV-AELC-YYYY-NNNN, quick toggle Paid/Unpaid
-- Jadwal mingguan grid (Mon–Fri × 7 time slot), tambah/hapus per sel, filter guru
-- Invoice generator: preview branded, Save-to-PDF, Send-to-WhatsApp (auto format 0→62)
-- Cascade delete siswa/guru → allocations + schedules
-- Backend testing: 22/22 pass
+## Implemented
+- **25 Sep 2026**: Restore penuh dari zip (via git checkout) ke environment baru; install deps backend (pyjwt, bcrypt, httpx, emergentintegrations) & frontend (html2canvas, jspdf, jszip, pako, xlsx); admin seeded (aelc.ask@gmail.com); testing agent iteration_5: backend 10/10 PASS, frontend 100% PASS.
 
-## Backlog / Next Priorities
-- P1: Dark mode toggle
-- P1: Upload logo Bimbel AELC (replace placeholder)
-- P1: Ekspor daftar siswa ke Excel/CSV
-- P2: Filter tanggal & analitik pendapatan bulanan (chart)
-- P2: Multi-invoice bulk WhatsApp reminder
-- P2: Role guru (login guru untuk lihat jadwal sendiri)
+## Backlog / Next Tasks
+- P1: Tambah suffix unik pada nomor invoice agar tidak kolisi untuk siswa dengan >1 alokasi
+- P2: Migrasi `@app.on_event` ke lifespan handler (deprecasi FastAPI)
+- P2: Google OAuth end-to-end test (butuh akun Google riil)
+- P2: Export Excel daftar siswa, reminder WhatsApp massal untuk invoice Unpaid
