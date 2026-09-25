@@ -1,0 +1,37 @@
+{
+  "summary": "Post-refactor regression (cookie-only auth, componentized Allocations/Schedules/Teachers, WA reminder uses company settings). Backend: 33/33 pytest passed (serial run via -o addopts=). Login sets Set-Cookie access_token HttpOnly Secure SameSite=None Max-Age=28800; GET /api/auth/me with cookie jar (no Bearer header) returns 200 for authed and 401 after logout. Frontend (desktop 1920x1080): (1) Login → dashboard; localStorage has NO 'aelc_token' (only posthog key); access_token cookie httpOnly=true secure=true sameSite=None. Reload preserves session (URL stays at /, no login form). (2) /alokasi: summary cards Paid Rp1.180.000 + Unpaid Rp360.000 = Grand Total Rp1.540.000 ✓; Reminder Unpaid dialog opens, WA href decoded contains '*Bank BCA*', 'No Rek: 4300961717', 'a/n CV ARTTA YASA NUSANTARA' — no 'ARITA'; Buka Semua present; Cetak Laporan downloads Laporan-Pendapatan-Semua-Guru-2026-09-25.pdf (6MB, image-based so text extract empty — expected html2canvas flow, unchanged behaviour). (3) /jadwal Dadang: grid renders with 3 schedule cards (Agus, no '#' prefix), 13 '—' unavailable cells, Cetak PDF → Jadwal-Dadang-2026-09-25.pdf (1 page, image-based), Export Excel → Jadwal-Dadang-2026-09-25.xlsx row3 header ['Waktu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'] ✓. (4) /guru edit dialog: 6 slot-group-{Monday..Saturday} data-testids present, 48 checkbox roles (6 day-all + 42 slots), 'Pilih semua' → 48 aria-checked=true, 'Kosongkan' → 0, Batal cancels without persist. (5) /invoice: 3 options; BILL TO renders without 'Tgl. Lahir' prefix; bank section shows 'CV ARTTA YASA NUSANTARA'. (6) /pengaturan: settings-holder input='CV ARTTA YASA NUSANTARA', settings-norek='4300961717', form inputs for backup-email, cp-current/new/confirm/otp all present. (7) Logout: redirects to /login; visiting / redirects to /login; fetch /api/auth/me returns 401. Zero JS pageerrors; only expected 401 console entries when unauthed request precedes login. Mobile 390x844: /alokasi scrollWidth=460 (still overflows 390, improved from 592 in iter_8), /jadwal scrollWidth=560 — sidebar still non-collapsible on mobile (pre-existing).",
+  "backend_issues": {"critical": [], "minor": [
+    {"endpoint": "pytest suite parallel run", "issue": "Default parallel xdist config (-n 2 --dist loadscope) intermittently causes admin lockout race between backend_test.py session-scoped login and other module tests; 8 errors 'Email atau password salah (N percobaan tersisa)'. Serial run (pytest -o addopts=) passes 33/33 cleanly. Pre-existing config issue, not a regression."}
+  ]},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Mobile 390x844 /alokasi and /jadwal", "issues": ["Sidebar still expanded (~260px) on mobile — no hamburger/drawer. Content overflows: /alokasi scrollWidth=460, /jadwal=560. Pre-existing from iteration_8 (mildly improved on /alokasi 592→460)."]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/backend_test.py",
+    "/app/backend/tests/test_security_and_features.py",
+    "/app/backend/tests/test_regression_prerelease.py",
+    "/app/test_reports/pytest/iteration_9.xml"
+  ],
+  "action_items": [
+    "(Optional) Fix pytest.ini xdist config or make module-level fixtures resilient to concurrent admin bad-login side-effects (e.g., clear login_attempts in session fixture with retry) — cosmetic, serial passes 33/33.",
+    "(Carry-over from iter_8) Add responsive Sheet/Drawer sidebar for viewports <768px."
+  ],
+  "critical_code_review_comments": [
+    "AuthContext / api.js cookie-only migration is clean: withCredentials on all axios calls, 401 interceptor redirects to /login on non-login endpoints, no aelc_token in localStorage. Verified live.",
+    "buildReminderLink now pulls holder/bank/norek from company settings — verified in DOM: WA link no longer contains hardcoded 'ARITA', shows 'CV ARTTA YASA NUSANTARA'.",
+    "server.py still 614 lines (unchanged) — modularization advice from iter_8 still applicable.",
+    "PDF exports (Laporan, Jadwal) are html2canvas-rasterized so pymupdf cannot extract text — testing via text assertions is not possible; verified by filename + non-zero size + 1-image-per-page confirmation. If text-searchable PDFs are desired, switch to a native jsPDF text draw or server-side reportlab."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100% (33/33 serial)", "frontend": "100% desktop; 1 carry-over mobile responsive issue"},
+  "test_credentials": "aelc.ask@gmail.com / AelcAdmin2026 (from /app/memory/test_credentials.md). db.login_attempts cleared at end. Password NOT changed. Company settings NOT modified.",
+  "seed_data_creation": "None. No test data left behind.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Run backend suite serially: `cd /app/backend && python -m pytest tests -q -o addopts= --junitxml=/app/test_reports/pytest/iteration_N.xml`. Clear login_attempts before any suite: `mongosh test_database --eval 'db.login_attempts.deleteMany({})'`. Cookie auth: use requests.Session() and let Set-Cookie propagate; no Bearer needed. Frontend refactor is stable — components/allocations/*, components/ScheduleGrid, components/TeacherSlotPicker, lib/allocations, lib/scheduleExport, lib/format normalizeSlots all wired correctly.",
+  "rca of the issue": "Parallel pytest lockout — pytest.ini forces `-n 2 --dist loadscope`. backend_test.py uses a session-scoped `token` fixture that logs in with the real admin password. test_security_and_features.py runs on the other worker and its lockout / wrong-password tests (against bogus_email + backup-email wrong-password + change-password happy path that temporarily changes admin pw) can leave admin with 1-4 failed attempts recorded on the shared MongoDB during the ~1s window before the session token fixture is created. Result: 401 with '4 percobaan tersisa'. Mitigation: (a) run serial with `-o addopts=`, (b) in conftest add a `db.login_attempts.delete_many({email:ADMIN_EMAIL})` before the login call in the session token fixture with 1 retry, (c) or run session token before other module tests using `pytest --dist loadfile` and a topmost autouse session fixture."
+}

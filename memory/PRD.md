@@ -42,7 +42,10 @@ User meng-upload zip berisi proyek Emergent "Bimbel AELC" dan meminta: "tolong b
 
 - **25 Sep 2026 (pre-release)**: Regresi penuh testing agent iteration_8: backend 33/33 PASS, frontend desktop + mobile PASS, 0 console error. Deployment agent PASS setelah fix: TTL index otp_codes dihapus (cleanup manual saat verifikasi/request), projeksi query dashboard.
 
+- **25 Sep 2026 (code review)**: Auth cookie-only (localStorage token dihapus; 401 → /login), AuthContext memo + log error; refactor komponen: components/allocations/{AllocationTable,AllocationReport,AllocationFormDialog,ReminderDialog}, ScheduleGrid, TeacherSlotPicker, lib/allocations.js, lib/scheduleExport.js, normalizeSlots di format.js; useCallback load di semua halaman; konstanta chart Dashboard; console.error dihapus; emailer._assert_safe_email dipecah 4 helper; tests baca kredensial dari tests/conftest.py (.env); test_settings restore nilai asli; WA reminder pakai pengaturan perusahaan; default holder "CV ARTTA YASA NUSANTARA". False positive review diabaikan: `is None` (bukan literal), `m` di list comprehension. Testing agent iteration_9: backend 33/33, frontend PASS.
+
 ## Backlog / Next Tasks
+- P1: Sidebar mobile collapsible (drawer) — saat ini layout mobile masih overflow horizontal (pre-existing)
 - P1: Halaman kelola akun admin tambahan (multi-user internal) — saat ini hanya 1 admin seeded
 - P2: Migrasi `@app.on_event` ke lifespan handler (deprecasi FastAPI)
 - P2: Export Excel daftar siswa, reminder WhatsApp massal untuk invoice Unpaid

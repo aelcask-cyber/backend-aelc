@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="8" failures="0" skipped="0" tests="33" time="11.135" timestamp="2026-09-25T10:52:53.981949+00:00" hostname="agent-env-689118c5-21d6-41c7-8dea-d21196a9caf4"><testcase classname="tests.test_regression_prerelease" name="test_unauthenticated_returns_401[/api/students]" time="0.377" /><testcase classname="tests.test_regression_prerelease" name="test_unauthenticated_returns_401[/api/teachers]" time="0.115" /><testcase classname="tests.test_security_and_features" name="test_login_returns_backup_email_field" time="0.545" /><testcase classname="tests.test_regression_prerelease" name="test_unauthenticated_returns_401[/api/allocations]" time="0.116" /><testcase classname="tests.test_security_and_features" name="test_google_session_endpoint_removed" time="0.114" /><testcase classname="tests.test_regression_prerelease" name="test_unauthenticated_returns_401[/api/schedules]" time="0.134" /><testcase classname="tests.test_security_and_features" name="test_lockout_after_5_failed_attempts" time="0.996" /><testcase classname="tests.test_regression_prerelease" name="test_unauthenticated_returns_401[/api/dashboard/stats]" time="0.131" /><testcase classname="tests.test_regression_prerelease" name="test_unauthenticated_returns_401[/api/dashboard/revenue-monthly]" time="0.115" /><testcase classname="tests.test_regression_prerelease" name="test_unauthenticated_returns_401[/api/settings]" time="0.195" /><testcase classname="tests.test_regression_prerelease" name="test_unauthenticated_returns_401[/api/auth/me]" time="0.121" /><testcase classname="tests.test_regression_prerelease" name="test_invoice_second_allocation_gets_suffix" time="1.811" /><testcase classname="tests.test_security_and_features" name="test_backup_email_wrong_password_401" time="0.345" /><testcase classname="tests.test_security_and_features" name="test_backup_email_set_correct" time="0.347" /><testcase classname="tests.test_security_and_features" name="test_request_otp_and_rate_limit" time="0.925" /><testcase classname="tests.test_regression_prerelease" name="test_delete_student_cascades" time="0.734" /><testcase classname="tests.test_security_and_features" name="test_change_password_weak_rejected" time="0.557" /><testcase classname="tests.test_security_and_features" name="test_change_password_wrong_otp" time="0.795" /><testcase classname="tests.test_regression_prerelease" name="test_delete_teacher_cascades" time="0.928" /><testcase classname="tests.test_security_and_features" name="test_change_password_happy_and_restore" time="3.406" /><testcase classname="tests.test_regression_prerelease" name="test_settings_put_and_get_persist" time="0.878" /><testcase classname="tests.backend_test" name="test_login_invalid" time="0.373" /><testcase classname="tests.backend_test" name="test_students_requires_auth" time="0.114" /><testcase classname="tests.backend_test" name="test_me" time="0.647"><error message="failed on setup with &quot;AssertionError: login failed: 401 {&quot;detail&quot;:&quot;Email atau password salah (4 percobaan tersisa)&quot;}&#10;assert 401 == 200&#10; +  where 401 = &lt;Response [401]&gt;.status_code&quot;">@pytest.fixture(scope="session")
+    def token():
+        r = requests.post(f"{BASE_URL}/api/auth/login",
+                          json={"email": ADMIN_EMAIL, "password": ADMIN_PASSWORD}, timeout=15)
+&gt;       assert r.status_code == 200, f"login failed: {r.status_code} {r.text}"
+E       AssertionError: login failed: 401 {"detail":"Email atau password salah (4 percobaan tersisa)"}
+E       assert 401 == 200
+E        +  where 401 = &lt;Response [401]&gt;.status_code
+
+tests/backend_test.py:13: AssertionError</error></testcase><testcase classname="tests.backend_test" name="test_students_crud" time="0.000"><error message="failed on setup with &quot;AssertionError: login failed: 401 {&quot;detail&quot;:&quot;Email atau password salah (4 percobaan tersisa)&quot;}&#10;assert 401 == 200&#10; +  where 401 = &lt;Response [401]&gt;.status_code&quot;">@pytest.fixture(scope="session")
+    def token():
+        r = requests.post(f"{BASE_URL}/api/auth/login",
+                          json={"email": ADMIN_EMAIL, "password": ADMIN_PASSWORD}, timeout=15)
+&gt;       assert r.status_code == 200, f"login failed: {r.status_code} {r.text}"
+E       AssertionError: login failed: 401 {"detail":"Email atau password salah (4 percobaan tersisa)"}
+E       assert 401 == 200
+E        +  where 401 = &lt;Response [401]&gt;.status_code
+
+tests/backend_test.py:13: AssertionError</error></testcase><testcase classname="tests.backend_test" name="test_teachers_crud" time="0.000"><error message="failed on setup with &quot;AssertionError: login failed: 401 {&quot;detail&quot;:&quot;Email atau password salah (4 percobaan tersisa)&quot;}&#10;assert 401 == 200&#10; +  where 401 = &lt;Response [401]&gt;.status_code&quot;">@pytest.fixture(scope="session")
+    def token():
+        r = requests.post(f"{BASE_URL}/api/auth/login",
+                          json={"email": ADMIN_EMAIL, "password": ADMIN_PASSWORD}, timeout=15)
+&gt;       assert r.status_code == 200, f"login failed: {r.status_code} {r.text}"
+E       AssertionError: login failed: 401 {"detail":"Email atau password salah (4 percobaan tersisa)"}
+E       assert 401 == 200
+E        +  where 401 = &lt;Response [401]&gt;.status_code
+
+tests/backend_test.py:13: AssertionError</error></testcase><testcase classname="tests.backend_test" name="test_allocations_invoice_and_payment" time="0.000"><error message="failed on setup with &quot;AssertionError: login failed: 401 {&quot;detail&quot;:&quot;Email atau password salah (4 percobaan tersisa)&quot;}&#10;assert 401 == 200&#10; +  where 401 = &lt;Response [401]&gt;.status_code&quot;">@pytest.fixture(scope="session")
+    def token():
+        r = requests.post(f"{BASE_URL}/api/auth/login",
+                          json={"email": ADMIN_EMAIL, "password": ADMIN_PASSWORD}, timeout=15)
+&gt;       assert r.status_code == 200, f"login failed: {r.status_code} {r.text}"
+E       AssertionError: login failed: 401 {"detail":"Email atau password salah (4 percobaan tersisa)"}
+E       assert 401 == 200
+E        +  where 401 = &lt;Response [401]&gt;.status_code
+
+tests/backend_test.py:13: AssertionError</error></testcase><testcase classname="tests.backend_test" name="test_schedule_crud" time="0.000"><error message="failed on setup with &quot;AssertionError: login failed: 401 {&quot;detail&quot;:&quot;Email atau password salah (4 percobaan tersisa)&quot;}&#10;assert 401 == 200&#10; +  where 401 = &lt;Response [401]&gt;.status_code&quot;">@pytest.fixture(scope="session")
+    def token():
+        r = requests.post(f"{BASE_URL}/api/auth/login",
+                          json={"email": ADMIN_EMAIL, "password": ADMIN_PASSWORD}, timeout=15)
+&gt;       assert r.status_code == 200, f"login failed: {r.status_code} {r.text}"
+E       AssertionError: login failed: 401 {"detail":"Email atau password salah (4 percobaan tersisa)"}
+E       assert 401 == 200
+E        +  where 401 = &lt;Response [401]&gt;.status_code
+
+tests/backend_test.py:13: AssertionError</error></testcase><testcase classname="tests.backend_test" name="test_dashboard_stats" time="0.000"><error message="failed on setup with &quot;AssertionError: login failed: 401 {&quot;detail&quot;:&quot;Email atau password salah (4 percobaan tersisa)&quot;}&#10;assert 401 == 200&#10; +  where 401 = &lt;Response [401]&gt;.status_code&quot;">@pytest.fixture(scope="session")
+    def token():
+        r = requests.post(f"{BASE_URL}/api/auth/login",
+                          json={"email": ADMIN_EMAIL, "password": ADMIN_PASSWORD}, timeout=15)
+&gt;       assert r.status_code == 200, f"login failed: {r.status_code} {r.text}"
+E       AssertionError: login failed: 401 {"detail":"Email atau password salah (4 percobaan tersisa)"}
+E       assert 401 == 200
+E        +  where 401 = &lt;Response [401]&gt;.status_code
+
+tests/backend_test.py:13: AssertionError</error></testcase><testcase classname="tests.backend_test" name="test_dashboard_revenue" time="0.000"><error message="failed on setup with &quot;AssertionError: login failed: 401 {&quot;detail&quot;:&quot;Email atau password salah (4 percobaan tersisa)&quot;}&#10;assert 401 == 200&#10; +  where 401 = &lt;Response [401]&gt;.status_code&quot;">@pytest.fixture(scope="session")
+    def token():
+        r = requests.post(f"{BASE_URL}/api/auth/login",
+                          json={"email": ADMIN_EMAIL, "password": ADMIN_PASSWORD}, timeout=15)
+&gt;       assert r.status_code == 200, f"login failed: {r.status_code} {r.text}"
+E       AssertionError: login failed: 401 {"detail":"Email atau password salah (4 percobaan tersisa)"}
+E       assert 401 == 200
+E        +  where 401 = &lt;Response [401]&gt;.status_code
+
+tests/backend_test.py:13: AssertionError</error></testcase><testcase classname="tests.backend_test" name="test_settings" time="0.000"><error message="failed on setup with &quot;AssertionError: login failed: 401 {&quot;detail&quot;:&quot;Email atau password salah (4 percobaan tersisa)&quot;}&#10;assert 401 == 200&#10; +  where 401 = &lt;Response [401]&gt;.status_code&quot;">@pytest.fixture(scope="session")
+    def token():
+        r = requests.post(f"{BASE_URL}/api/auth/login",
+                          json={"email": ADMIN_EMAIL, "password": ADMIN_PASSWORD}, timeout=15)
+&gt;       assert r.status_code == 200, f"login failed: {r.status_code} {r.text}"
+E       AssertionError: login failed: 401 {"detail":"Email atau password salah (4 percobaan tersisa)"}
+E       assert 401 == 200
+E        +  where 401 = &lt;Response [401]&gt;.status_code
+
+tests/backend_test.py:13: AssertionError</error></testcase><testcase classname="tests.test_security_and_features" name="test_teacher_slots_persist" time="0.640" /><testcase classname="tests.test_security_and_features" name="test_schedule_validation_and_all_days" time="1.580" /></testsuite></testsuites>
