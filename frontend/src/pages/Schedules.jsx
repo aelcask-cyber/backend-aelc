@@ -84,25 +84,11 @@ export default function Schedules() {
       await new Promise(r => setTimeout(r, 350));
       if (!printRef.current) throw new Error("no sheet");
       const canvas = await html2canvas(printRef.current, { scale: 2, backgroundColor: "#ffffff", windowWidth: 1400 });
-      const pageW = 297, pageH = 210;
-      const imgH = (canvas.height * pageW) / canvas.width;
-      const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
-      if (imgH <= pageH) {
-        pdf.addImage(canvas.toDataURL("image/png"), "PNG", 0, 0, pageW, imgH);
-      } else {
-        const pxPerMM = canvas.width / pageW;
-        const pageChunkPx = Math.floor(pageH * pxPerMM);
-        let sY = 0;
-        while (sY < canvas.height) {
-          const chunkH = Math.min(pageChunkPx, canvas.height - sY);
-          const tmp = document.createElement("canvas");
-          tmp.width = canvas.width; tmp.height = chunkH;
-          tmp.getContext("2d").drawImage(canvas, 0, sY, canvas.width, chunkH, 0, 0, canvas.width, chunkH);
-          pdf.addImage(tmp.toDataURL("image/png"), "PNG", 0, 0, pageW, chunkH / pxPerMM);
-          sY += chunkH;
-          if (sY < canvas.height) pdf.addPage("a4", "landscape");
-        }
-      }
+      // Halaman PDF mengikuti tinggi konten (lebar A4 landscape 297mm) — seluruh Senin–Sabtu utuh tanpa ruang kosong
+      const pageW = 297;
+      const pageH = (canvas.height * pageW) / canvas.width;
+      const pdf = new jsPDF({ orientation: pageH > pageW ? "portrait" : "landscape", unit: "mm", format: [pageW, pageH] });
+      pdf.addImage(canvas.toDataURL("image/png"), "PNG", 0, 0, pageW, pageH);
       pdf.save(`${fileLabel()}.pdf`);
       toast.success("PDF jadwal berhasil diunduh", { id: "sch" });
     } catch (e) { toast.error("Gagal membuat PDF", { id: "sch" }); }

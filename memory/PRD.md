@@ -32,6 +32,8 @@ User meng-upload zip berisi proyek Emergent "Bimbel AELC" dan meminta: "tolong b
 
 - **25 Sep 2026 (batch 4)**: Invoice: BILL TO tampil tanggal lahir tanpa prefiks "Tgl. Lahir", baris "Guru: ..." di Description dihapus. Kapitalisasi otomatis huruf awal tiap kata (`capWords`) pada input Nama/Kelas/Sekolah siswa, Nama/Mapel guru, Buku alokasi; data lama dinormalisasi sekali via script.
 
+- **25 Sep 2026 (batch 5)**: Bug Cetak PDF jadwal terpotong (html2canvas menangkap container scroll → kolom Senin & judul terpotong, tombol "+ Tambah" ikut tercetak). Fix: render offscreen `SchedulePrintSheet` (lebar tetap 1400px, tanpa tombol), halaman PDF pas konten (lebar 297mm). Tombol → "Cetak PDF"; tambah "Export Excel" (xlsx: Waktu × Senin–Sabtu). Testing agent iteration_7: PASS.
+
 ## Backlog / Next Tasks
 - P1: Halaman kelola akun admin tambahan (multi-user internal) — saat ini hanya 1 admin seeded
 - P2: Migrasi `@app.on_event` ke lifespan handler (deprecasi FastAPI)

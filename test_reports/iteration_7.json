@@ -1,0 +1,23 @@
+{
+  "summary": "Frontend-only verification of Jadwal Siswa Cetak PDF / Export Excel fix. Logged in as admin, opened /jadwal, selected teacher 'Dadang' (has 3 existing schedules on Senin/Jumat/Sabtu). Downloaded PDF via 'Cetak PDF' (print-schedule-btn) and Excel via 'Export Excel' (export-schedule-excel-btn) using Playwright expect_download. Verified PDF with pymupdf: page count = 1, page width = 841.89pt (~297mm A4 landscape), rendered PNG shows full table with all six day headers 'Senin, Selasa, Rabu, Kamis, Jumat, Sabtu' fully visible (no clipped column), title 'Jadwal Mingguan — Dadang' rendered, student '#1 Agus' appears in Senin/Jumat/Sabtu, no 'Tambah' buttons visible in output. Verified Excel with openpyxl: sheet 'Jadwal', row 3 header exactly ['Waktu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'], one row per teacher time slot, student names in correct day columns as '#1 Agus (P 5)'. On-screen grid: added a new schedule on Selasa 10.00-11.00, card appeared immediately, then deleted it successfully — no console errors. All required fixes confirmed working.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": ["/tmp/dl/jadwal.pdf", "/tmp/dl/jadwal.xlsx", "/tmp/dl/page1.png"],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "PDF text is not selectable because printPDF() rasterizes the print sheet via html2canvas → PNG → jsPDF.addImage. This is fine for the current visual-fidelity requirement, but text search inside the PDF (Ctrl+F) will not work. If searchable PDF is needed later, consider using jsPDF autoTable or pdfmake to render the table as real text.",
+    "printPDF() currently uses fixed A4 landscape (297x210mm) — the request mentioned 'height = content'. In practice the content fits within one A4 landscape page for a 6-slot table (as verified), so page count = 1 and no clipping. If teacherSlots grows large, the code already has a multi-page fallback (imgH > pageH branch)."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a", "frontend": "100%"},
+  "test_credentials": "aelc.ask@gmail.com / AelcAdmin2026 (from /app/memory/test_credentials.md)",
+  "seed_data_creation": "None. Used pre-existing teacher 'Dadang' with 3 schedules. Temporary schedule added on Selasa 10.00-11.00 was deleted at end of test — no residual test data.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "PDF output is a rasterized image (html2canvas), so pymupdf get_text() returns empty; verify visually by rendering page to PNG with get_pixmap(dpi=140). Excel content is well-formed with title on row 1, blank row 2, header row 3, then data rows. Only 6 rows appear (matches TIME_SLOTS ∩ teacher.available_slots ∪ existing schedules) even though banner says '23 slot jam' — this is expected because banner counts distinct available_slots entries per (day,time) tuple, while grid rows dedupe by time.",
+  "rca of the issue": "Not applicable — this iteration only verified an already-applied fix. Previous bug (clipped Senin column, missing days, 'Tambah' in PDF) was resolved by rendering PDF from a dedicated offscreen SchedulePrintSheet component with fixed 1400px width, no buttons, and using html2canvas windowWidth=1400 so the full 7-column layout is captured, then scaled to fit A4 landscape width."
+}
