@@ -38,6 +38,8 @@ User meng-upload zip berisi proyek Emergent "Bimbel AELC" dan meminta: "tolong b
 
 - **25 Sep 2026 (batch 7)**: Grand Total di halaman Siswa per Guru & Laporan Pendapatan (header + footer PDF) = Paid + Unpaid; label "(tidak dihitung)" dihapus; rincian Paid dan Unpaid tetap ditampilkan.
 
+- **25 Sep 2026 (batch 8)**: Footer tabel Laporan Pendapatan → "GRAND TOTAL PAID" (hanya Paid, hijau); header kanan atas tetap Paid + Unpaid.
+
 ## Backlog / Next Tasks
 - P1: Halaman kelola akun admin tambahan (multi-user internal) — saat ini hanya 1 admin seeded
 - P2: Migrasi `@app.on_event` ke lifespan handler (deprecasi FastAPI)

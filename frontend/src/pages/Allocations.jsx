@@ -296,8 +296,8 @@ export default function Allocations() {
             </tbody>
             <tfoot>
               <tr style={{background:"#F8FAFC"}}>
-                <td colSpan={8} className="px-2 py-2 text-right font-bold">GRAND TOTAL (PAID + UNPAID)</td>
-                <td className="px-2 py-2 text-right font-mono font-extrabold" style={{color:"#1D4ED8"}}>{fmtIDR(filteredTotal)}</td>
+                <td colSpan={8} className="px-2 py-2 text-right font-bold">GRAND TOTAL PAID</td>
+                <td className="px-2 py-2 text-right font-mono font-extrabold" style={{color:"#047857"}}>{fmtIDR(filteredPaid)}</td>
                 <td colSpan={2}></td>
               </tr>
             </tfoot>
