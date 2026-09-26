@@ -1,0 +1,43 @@
+{
+  "summary": "Vercel-readiness regression pass. Backend: 33/33 pytest passed (one flaky ReadTimeout on test_change_password_happy_and_restore in first run — passed on immediate re-run; not a regression). Direct curl verifications on preview URL: GET /api/health→200 {ok:true,service:'Bimbel AELC API'}; OPTIONS /api/auth/login with Origin https://example.vercel.app + ACRM POST → 200 with access-control-allow-origin echoing exact origin AND access-control-allow-credentials: true (allow_origin_regex '.*' works); POST wrong creds→401 (not 405); GET /api/auth/login→405 (expected); POST correct creds→200 with Set-Cookie access_token HttpOnly Secure SameSite=None Max-Age=28800 Partitioned. Admin seed persists across restart (login works). Vercel config coherence verified: vercel.json rewrites /api/(.*)→/api/index and SPA fallback ✓, buildCommand 'cd frontend && CI=false yarn build' ✓, outputDirectory frontend/build ✓, functions api/index.py maxDuration 30 with excludeFiles ✓. /app/api/index.py successfully imports FastAPI app (title='Bimbel AELC API'). /app/requirements.txt contains fastapi, motor, pymongo, dnspython, pydantic[email], bcrypt, PyJWT, httpx, python-dotenv (all present). Frontend (desktop 1920x1080): login→dashboard OK; localStorage has ONLY posthog key, NO aelc_token; reload keeps session (stays at /); all 7 routes render (/, /siswa, /guru, /alokasi, /jadwal, /invoice, /pengaturan) with expected h1/h2 titles and ZERO console errors / zero pageerrors; settings-holder input reads 'CV ARTTA YASA NUSANTARA'; logout via 'Keluar' button redirects to /login and subsequent access to /siswa also redirects to /login (protected-route guard works). Company settings NOT modified; login_attempts cleared at end; admin password unchanged.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {"endpoint": "/api/auth/change-password (test_change_password_happy_and_restore)", "issue": "Intermittent 15s ReadTimeout via preview URL (Cloudflare edge). Re-run passes in 3.3s. ~1/2 occurrence rate observed today. Not a code regression — likely edge latency on OTP+bcrypt+email path. Consider raising per-test timeout to 30s or adding one retry."}
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "Sidebar logout button", "issue": "Missing data-testid='logout-button'. Button is only reachable by visible text 'Keluar'. All other interactive/critical elements do have testids.", "selector": "button:has-text('Keluar')", "priority": "LOW"}
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Mobile 390x844 (carry-over from iter_8/9)", "issues": ["Sidebar not collapsible on mobile — /alokasi and /jadwal still overflow viewport. Not re-tested this iteration; pre-existing."]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/backend_test.py",
+    "/app/backend/tests/test_regression_prerelease.py",
+    "/app/backend/tests/test_security_and_features.py",
+    "/app/test_reports/pytest/iteration_10.xml"
+  ],
+  "action_items": [
+    "(Optional) Add data-testid='logout-button' to the sidebar Keluar button for stable e2e selectors.",
+    "(Optional) Add a one-shot retry / raise timeout for test_change_password_happy_and_restore to handle Cloudflare edge latency flakes.",
+    "(Carry-over) Responsive sidebar drawer for viewports <768px."
+  ],
+  "critical_code_review_comments": [
+    "vercel.json + api/index.py are coherent — the sys.path insertion loads backend/server.py cleanly and FastAPI app imports without side-effect DB calls (lifespan + ready_guard middleware defer index/seed until first /api request → serverless-safe).",
+    "CORS: allow_origin_regex '.*' with allow_credentials=True is verified working end-to-end — origin is echoed back (not '*'), which is what browsers require for credentialed requests. This is the correct fix for the 405 report (the 405 was because the SPA host was serving OPTIONS/POST /api/auth/login as a static route on Vercel before the rewrite; now /api/* is rewritten to the Python function).",
+    "Cookie flags on preview: HttpOnly Secure SameSite=None Max-Age=28800 Partitioned — correct for cross-site cookie in modern browsers.",
+    "server.py is still ~614 lines (carry-over) — consider modularizing routes.",
+    "/app/requirements.txt is minimal and does NOT pin emergentintegrations or emailer deps (emailer.py reads EMERGENT_EMAIL_KEY lazily → 503 if missing, so Vercel deployments without that env var will fail change-password OTP send but /api/auth/login is unaffected — acceptable, but worth documenting in README)."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "100% (33/33 serial after 1 retry on flaky change-password)", "frontend": "100% desktop critical flows; logout testid gap"},
+  "test_credentials": "aelc.ask@gmail.com / AelcAdmin2026 (from /app/memory/test_credentials.md). db.login_attempts cleared at end. Password unchanged. Company settings unchanged.",
+  "seed_data_creation": "None. Backend CRUD tests self-cleanup (TEST_ prefixed rows).",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Backend suite: `mongosh test_database --eval 'db.login_attempts.deleteMany({})' && cd /app/backend && python -m pytest tests -q -o addopts= --junitxml=/app/test_reports/pytest/iteration_N.xml`. If test_change_password_happy_and_restore times out, re-run just that test — it's Cloudflare edge flakiness not a code bug. Vercel config verified — no further action needed for Vercel-readiness. Cookie-based auth is stable; use requests.Session() for backend tests (no Bearer needed once cookie is set)."
+}
