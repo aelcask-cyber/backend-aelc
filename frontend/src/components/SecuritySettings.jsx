@@ -1,5 +1,5 @@
 import { useState } from "react";
-import api, { formatApiError } from "@/lib/api";
+import api, { formatApiError, setAuthToken } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -82,7 +82,8 @@ export function ChangePasswordCard() {
     if (f.next !== f.confirm) return toast.error("Konfirmasi password tidak sama");
     setBusy(true);
     try {
-      await api.post("/auth/change-password", { current_password: f.current, new_password: f.next, otp: f.otp });
+      const { data } = await api.post("/auth/change-password", { current_password: f.current, new_password: f.next, otp: f.otp });
+      setAuthToken(data.token);
       setF({ current: "", next: "", confirm: "", otp: "" }); setSentTo("");
       toast.success("Password berhasil diubah. Sesi perangkat lain otomatis keluar.");
     } catch (e) { toast.error(formatApiError(e)); }

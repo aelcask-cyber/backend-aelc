@@ -10,9 +10,14 @@ from fastapi import HTTPException
 logger = logging.getLogger("aelc.email")
 
 EMAIL_BASE_URL = "https://integrations.emergentagent.com"
-EMAIL_KEY = os.environ["EMERGENT_EMAIL_KEY"]
-EMAIL_FROM_NAME = os.environ["EMAIL_FROM_NAME"]
-EMAIL_REPLY_TO = os.environ.get("EMAIL_REPLY_TO")
+EMAIL_FROM_NAME = os.environ.get("EMAIL_FROM_NAME", "Bimbel AELC")
+
+
+def _email_key() -> str:
+    key = os.environ.get("EMERGENT_EMAIL_KEY")
+    if not key:
+        raise HTTPException(status_code=503, detail="Layanan email belum dikonfigurasi (EMERGENT_EMAIL_KEY)")
+    return key
 
 _SHORTENERS = ("bit.ly", "tinyurl.com", "t.co", "is.gd", "cutt.ly", "goo.gl", "rebrand.ly")
 _CRED_ASK = ("reply with your password", "reply with the code", "send your password", "cvv",
@@ -105,14 +110,16 @@ def _assert_safe_email(subject: str, html: str) -> None:
 
 async def send_email(*, to: str, subject: str, html: str) -> str | None:
     _assert_safe_email(subject, html)
+    key = _email_key()
     payload = {"to": [to], "subject": subject, "html": html, "from_name": EMAIL_FROM_NAME}
-    if EMAIL_REPLY_TO:
-        payload["contact_email"] = EMAIL_REPLY_TO
+    reply_to = os.environ.get("EMAIL_REPLY_TO")
+    if reply_to:
+        payload["contact_email"] = reply_to
     try:
         async with httpx.AsyncClient(timeout=30) as client:
             resp = await client.post(
                 f"{EMAIL_BASE_URL}/api/v1/email/send",
-                headers={"X-Email-Key": EMAIL_KEY},
+                headers={"X-Email-Key": key},
                 json=payload,
             )
         resp.raise_for_status()

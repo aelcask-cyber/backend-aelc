@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import api, { formatApiError } from "@/lib/api";
+import api, { formatApiError, setAuthToken } from "@/lib/api";
 
 const AuthContext = createContext(null);
 
@@ -20,6 +20,7 @@ export function AuthProvider({ children }) {
       setError("");
       try {
         const { data } = await api.post("/auth/login", { email, password });
+        setAuthToken(data.token);
         setUser(data.user);
         return true;
       } catch (e) {
@@ -34,6 +35,7 @@ export function AuthProvider({ children }) {
     logout: async () => {
       try { await api.post("/auth/logout"); }
       catch (e) { console.warn("Logout server gagal, sesi lokal dihapus:", formatApiError(e)); }
+      setAuthToken(null);
       setUser(false);
     },
   }), [user, error]);
