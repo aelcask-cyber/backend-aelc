@@ -5,11 +5,13 @@ load_dotenv(ROOT_DIR / ".env")
 
 import os
 import re
+import asyncio
 import logging
 import uuid
 import secrets
 import bcrypt
 import jwt
+from contextlib import asynccontextmanager
 from html import escape
 from datetime import datetime, timezone, timedelta
 from typing import List, Literal
@@ -562,14 +564,26 @@ async def delete_logo(user: dict = Depends(get_current_user)):
     return {"ok": True}
 
 # ============ STARTUP ============
-@app.on_event("startup")
-async def startup():
-    await db.users.create_index("email", unique=True)
-    await db.students.create_index("no_urut")
-    await db.login_attempts.create_index("identifier", unique=True)
-    await db.otp_codes.create_index("expires_at")
-    await db.schedules.create_index([("teacher_id", 1), ("day", 1), ("time_slot", 1)])
+_ready = False
+_ready_lock = asyncio.Lock()
 
+async def ensure_ready():
+    """Buat index & seed admin sekali saja — dipanggil dari lifespan dan middleware (aman untuk serverless/Vercel)."""
+    global _ready
+    if _ready:
+        return
+    async with _ready_lock:
+        if _ready:
+            return
+        await db.users.create_index("email", unique=True)
+        await db.students.create_index("no_urut")
+        await db.login_attempts.create_index("identifier", unique=True)
+        await db.otp_codes.create_index("expires_at")
+        await db.schedules.create_index([("teacher_id", 1), ("day", 1), ("time_slot", 1)])
+        await seed_admin()
+        _ready = True
+
+async def seed_admin():
     admin_email = os.environ.get("ADMIN_EMAIL", "admin@example.com").lower()
     admin_pw = os.environ.get("ADMIN_PASSWORD", "admin123")
     admin_name = os.environ.get("ADMIN_NAME", "Admin")
@@ -599,16 +613,35 @@ async def startup():
             await db.users.update_one({"email": admin_email}, {"$set": updates})
             logger.info(f"Updated admin user: {admin_email}")
 
-@app.on_event("shutdown")
-async def shutdown():
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    try:
+        await ensure_ready()
+    except Exception as e:
+        logger.error(f"Inisialisasi DB gagal saat startup, akan dicoba ulang per-request: {e}")
+    yield
     client.close()
+
+app.router.lifespan_context = lifespan
+
+@app.middleware("http")
+async def ready_guard(request: Request, call_next):
+    if request.url.path.startswith("/api") and request.method != "OPTIONS":
+        await ensure_ready()
+    return await call_next(request)
+
+@app.get("/api/health")
+async def health():
+    return {"ok": True, "service": "Bimbel AELC API"}
 
 app.include_router(api)
 
+_cors_origins = [o.strip() for o in os.environ.get("CORS_ORIGINS", "*").split(",") if o.strip()]
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=os.environ.get("CORS_ORIGINS", "*").split(","),
+    allow_origins=[] if _cors_origins == ["*"] else _cors_origins,
+    allow_origin_regex=".*" if _cors_origins == ["*"] else None,
     allow_methods=["*"],
     allow_headers=["*"],
 )
