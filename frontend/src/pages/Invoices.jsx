@@ -198,7 +198,7 @@ function InvoiceBody({ logo, company, alloc, student, teacher, totalBiaya, total
           )}
           <div>
             <div className="text-2xl font-extrabold text-slate-900">Bimbel AELC</div>
-            <div className="text-xs text-slate-500 font-semibold">CV ARITA YASA NUSANTARA</div>
+            <div className="text-xs text-slate-500 font-semibold">CV ARTTA YASA NUSANTARA</div>
             <div className="text-xs text-slate-500 mt-1 max-w-xs leading-relaxed">{company.alamat}</div>
           </div>
         </div>
